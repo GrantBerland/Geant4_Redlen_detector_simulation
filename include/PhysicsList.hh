@@ -23,44 +23,31 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-/// \file PrimaryGeneratorAction.hh
-/// \brief Definition of the PrimaryGeneratorAction class
+/// \file PhysicsList.hh
+/// \brief Definition of the PhysicsList class
 //
+// $Id: PhysicsList.hh 66587 2012-12-21 11:06:44Z ihrivnac $
 //
-// $Id: PrimaryGeneratorAction.hh 66241 2012-12-13 18:34:42Z gunter $
-//
-// 
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+#ifndef PhysicsList_h
+#define PhysicsList_h 1
 
-#ifndef PrimaryGeneratorAction_h
-#define PrimaryGeneratorAction_h 1
-
-#include "G4VUserPrimaryGeneratorAction.hh"
-#include "G4ParticleGun.hh"
+#include "G4VModularPhysicsList.hh"
 #include "globals.hh"
 
-class G4Event;
-
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
+class PhysicsList: public G4VModularPhysicsList
 {
-  public:
-    PrimaryGeneratorAction();    
-   ~PrimaryGeneratorAction();
+public:
+  PhysicsList();
+ ~PhysicsList();
 
-  public:
-    virtual void GeneratePrimaries(G4Event*);
-    G4ParticleGun* GetParticleGun() {return fParticleGun;};
-
-  private:
-    G4ParticleGun*  fParticleGun;        //pointer a to G4 service class
+public:
+  virtual void ConstructParticle();
+  virtual void SetCuts();
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
-
-

@@ -23,44 +23,51 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-/// \file PrimaryGeneratorAction.hh
-/// \brief Definition of the PrimaryGeneratorAction class
+/// \file DetectorMessenger.hh
+/// \brief Definition of the DetectorMessenger class
 //
+// $Id: DetectorMessenger.hh 67103 2013-01-31 18:18:03Z maire $
 //
-// $Id: PrimaryGeneratorAction.hh 66241 2012-12-13 18:34:42Z gunter $
-//
-// 
-
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#ifndef PrimaryGeneratorAction_h
-#define PrimaryGeneratorAction_h 1
+#ifndef DetectorMessenger_h
+#define DetectorMessenger_h 1
 
-#include "G4VUserPrimaryGeneratorAction.hh"
-#include "G4ParticleGun.hh"
+#include "G4UImessenger.hh"
 #include "globals.hh"
 
-class G4Event;
+class DetectorConstruction;
+class G4UIdirectory;
+class G4UIcmdWithAString;
+class G4UIcmdWithADoubleAndUnit;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
+class DetectorMessenger: public G4UImessenger
 {
   public:
-    PrimaryGeneratorAction();    
-   ~PrimaryGeneratorAction();
-
-  public:
-    virtual void GeneratePrimaries(G4Event*);
-    G4ParticleGun* GetParticleGun() {return fParticleGun;};
-
+  
+    DetectorMessenger(DetectorConstruction* );
+   ~DetectorMessenger();
+    
+    virtual void SetNewValue(G4UIcommand*, G4String);
+    
   private:
-    G4ParticleGun*  fParticleGun;        //pointer a to G4 service class
+  
+    DetectorConstruction*      fDetector;
+    
+    G4UIdirectory*             fRdecayDir;
+    G4UIdirectory*             fDetDir;
+    G4UIcmdWithAString*        fTargMatCmd;
+    G4UIcmdWithAString*        fDetectMatCmd;
+    G4UIcmdWithADoubleAndUnit* fTargRadiusCmd;
+    G4UIcmdWithADoubleAndUnit* fDetectThicknessCmd;
+    G4UIcmdWithADoubleAndUnit* fTargLengthCmd;
+    G4UIcmdWithADoubleAndUnit* fDetectLengthCmd;    
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
-
 

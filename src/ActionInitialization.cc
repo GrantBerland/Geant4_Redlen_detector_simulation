@@ -32,12 +32,15 @@
 #include "PrimaryGeneratorAction.hh"
 #include "RunAction.hh"
 #include "EventAction.hh"
+#include "TrackingAction.hh"
 #include "SteppingAction.hh"
+#include "SteppingVerbose.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-ActionInitialization::ActionInitialization()
- : G4VUserActionInitialization()
+ActionInitialization::ActionInitialization(DetectorConstruction* detector)
+ : G4VUserActionInitialization(),
+   fDetector(detector)
 {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -49,7 +52,7 @@ ActionInitialization::~ActionInitialization()
 
 void ActionInitialization::BuildForMaster() const
 {
-  RunAction* runAction = new RunAction;
+  RunAction* runAction = new RunAction(fDetector, 0);
   SetUserAction(runAction);
 }
 
@@ -57,15 +60,27 @@ void ActionInitialization::BuildForMaster() const
 
 void ActionInitialization::Build() const
 {
-  SetUserAction(new PrimaryGeneratorAction);
+  PrimaryGeneratorAction* primary = new PrimaryGeneratorAction();
+  SetUserAction(primary);
+    
+  RunAction* runAction = new RunAction(fDetector, primary );
+  SetUserAction(runAction);
+  
+  EventAction* event = new EventAction();
+  SetUserAction(event);  
+  
+  TrackingAction* trackingAction = new TrackingAction(fDetector);
+  SetUserAction(trackingAction);
+  
+  SteppingAction* steppingAction = new SteppingAction(fDetector, event);
+  SetUserAction(steppingAction);
+}  
 
-  RunAction* runAction = new RunAction;
-  SetUserAction(new RunAction);
-  
-  EventAction* eventAction = new EventAction(runAction);
-  SetUserAction(eventAction);
-  
-  SetUserAction(new SteppingAction(eventAction));
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+G4VSteppingVerbose* ActionInitialization::InitializeSteppingVerbose() const
+{
+  return new SteppingVerbose();
 }  
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

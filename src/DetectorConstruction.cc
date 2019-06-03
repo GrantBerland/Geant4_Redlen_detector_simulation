@@ -23,238 +23,323 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: DetectorConstruction.cc 94307 2015-11-11 13:42:46Z gcosmo $
-//
 /// \file DetectorConstruction.cc
 /// \brief Implementation of the DetectorConstruction class
+//
+// $Id: DetectorConstruction.cc 70755 2013-06-05 12:17:48Z ihrivnac $
+//
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #include "DetectorConstruction.hh"
+#include "DetectorMessenger.hh"
 
-#include "G4RunManager.hh"
+#include "G4Material.hh"
 #include "G4NistManager.hh"
+
+#include "G4Tubs.hh"
 #include "G4Box.hh"
-#include "G4Cons.hh"
-#include "G4Orb.hh"
-#include "G4Sphere.hh"
-#include "G4Trd.hh"
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
-#include "G4SystemOfUnits.hh"
 
-#include <fstream>
+#include "G4GeometryManager.hh"
+#include "G4PhysicalVolumeStore.hh"
+#include "G4LogicalVolumeStore.hh"
+#include "G4SolidStore.hh"
+#include "G4RunManager.hh"
+
+#include "G4SystemOfUnits.hh"
+#include "G4PhysicalConstants.hh"
+#include "G4UnitsTable.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 DetectorConstruction::DetectorConstruction()
-: G4VUserDetectorConstruction(),
-  fScoringVolume(0)
-{ }
+:G4VUserDetectorConstruction(),
+ fTargetMater(0), fLogicTarget(0),
+ fDetectorMater(0), fLogicDetector(0), 
+ fWorldMater(0), fPhysiWorld(0),
+ fDetectorMessenger(0)
+{
+  fTargetLength      = 0.5*cm; 
+  fTargetRadius      = 1.*cm;
+  fDetectorLength    = 39.*mm; 
+  fDetectorThickness = 5.*cm;
+  
+  fWorldLength = std::max(fTargetLength,fDetectorLength);
+  fWorldRadius = fTargetRadius + fDetectorThickness;
+      
+  DefineMaterials();
+    
+  fDetectorMessenger = new DetectorMessenger(this);
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 DetectorConstruction::~DetectorConstruction()
-{ }
+{ delete fDetectorMessenger;}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 G4VPhysicalVolume* DetectorConstruction::Construct()
 {
-  // Get nist material manager
-  G4NistManager* nist = G4NistManager::Instance();
+  return ConstructVolumes();
+}
 
-  // Envelope parameters
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void DetectorConstruction::DefineMaterials()
+{
+  // build materials
+ 
+  // CZT for detector
+  G4Element* Cd = new G4Element("Cadmium","Cd",48., 112.41*g/mole);
+  G4Element* Zn = new G4Element("Zinc","Zn", 30., 65.38*g/mole);
+  G4Element* Te = new G4Element("Tellurium","Te", 52., 127.60*g/mole);
+  G4Material* CZT = new G4Material("CZT", 5.8*g/cm3, 3);
+  CZT->AddElement(Cd, 48*perCent);
+  CZT->AddElement(Zn, 2*perCent);
+  CZT->AddElement(Te, 50*perCent);
+
+  fDetectorMater = CZT; 
+
+  G4Element* N  = new G4Element("Nitrogen", "N", 7, 14.01*g/mole);
+  G4Element* O  = new G4Element("Oxygen",   "O", 8, 16.00*g/mole);
   //
-  G4double env_sizeXY = 20*cm, env_sizeZ = 30*cm;
-
-    // Material: Vacuum
-    //TODO: check pressures, environment for Van Allen belt altitudes
-  G4Material* vacuum_material = new G4Material("Vacuum",
-              1.0 , 1.01*g/mole, 1.0E-25*g/cm3,
-              kStateGas, 2.73*kelvin, 3.0E-18*pascal );
-
-  // Option to switch on/off checking of volumes overlaps
+  G4int ncomponents; G4double fractionmass;      
+  G4Material* Air20 = new G4Material("Air", 1.205*mg/cm3, ncomponents=2,
+                      kStateGas, 293.*kelvin, 1.*atmosphere);
+    Air20->AddElement(N, fractionmass=0.7);
+    Air20->AddElement(O, fractionmass=0.3);
   //
-  G4bool checkOverlaps = true;
-
+  fWorldMater = Air20;
+  
+  // or use G4 materials data base
   //
+  G4NistManager* man = G4NistManager::Instance();  
+  fTargetMater = man->FindOrBuildMaterial("G4_CESIUM_IODIDE");
+                   
+ ///G4cout << *(G4Material::GetMaterialTable()) << G4endl;
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+G4VPhysicalVolume* DetectorConstruction::ConstructVolumes()
+{
+  // Cleanup old geometry
+  G4GeometryManager::GetInstance()->OpenGeometry();
+  G4PhysicalVolumeStore::GetInstance()->Clean();
+  G4LogicalVolumeStore::GetInstance()->Clean();
+  G4SolidStore::GetInstance()->Clean();
+  
   // World
   //
-  G4double world_sizeXY = 1.2*env_sizeXY;
-  G4double world_sizeZ  = 1.2*env_sizeZ;
-  // G4Material* world_mat = nist->FindOrBuildMaterial("G4_AIR");
+  // (re) compute World dimensions if necessary
+  fWorldLength = std::max(fTargetLength,fDetectorLength);
+  fWorldRadius = fTargetRadius + fDetectorThickness;
+    
+  G4Tubs*
+  sWorld = new G4Tubs("World",                                 //name
+                 0.,fWorldRadius, 0.5*fWorldLength, 0.,twopi); //dimensions  
+                   
+  G4LogicalVolume*
+  lWorld = new G4LogicalVolume(sWorld,                  //shape
+                             fWorldMater,               //material
+                             "World");                  //name
 
-  G4Box* solidWorld =
-    new G4Box("World",                       //its name
-       0.5*world_sizeXY, 0.5*world_sizeXY, 0.5*world_sizeZ);     //its size
-
-  G4LogicalVolume* logicWorld =
-    new G4LogicalVolume(solidWorld,          //its solid
-                        vacuum_material,           //its material
-                        "World");            //its name
-
-  G4VPhysicalVolume* physWorld =
-    new G4PVPlacement(0,                     //no rotation
-                      G4ThreeVector(),       //at (0,0,0)
-                      logicWorld,            //its logical volume
-                      "World",               //its name
-                      0,                     //its mother  volume
-                      false,                 //no boolean operation
-                      0,                     //copy number
-                      checkOverlaps);        //overlaps checking
-
+  fPhysiWorld = new G4PVPlacement(0,                    //no rotation
+                            G4ThreeVector(),            //at (0,0,0)
+                            lWorld,                     //logical volume
+                            "World",                    //name
+                            0,                          //mother volume
+                            false,                      //no boolean operation
+                            0);                         //copy number
+                            
+  // Target
   //
-  // Envelope
+  G4Tubs* 
+  sTarget = new G4Tubs("Target",                                   //name
+                  0., fTargetRadius, 0.5*fTargetLength, 0.,twopi); //dimensions
+
+
+  fLogicTarget = new G4LogicalVolume(sTarget,           //shape
+                             fTargetMater,              //material
+                             "Target");                 //name
+                  
+  G4RotationMatrix* target_rotm = new G4RotationMatrix();
+  target_rotm->rotateX(90.*deg);
+  target_rotm->rotateY(90.*deg);  
+           new G4PVPlacement(target_rotm,           //90 deg rotation
+                           G4ThreeVector(50.*mm, 0., 0.), //at (0,0,0)
+                           fLogicTarget,                //logical volume
+                           "Target",                    //name
+                           lWorld,                      //mother  volume
+                           false,                       //no boolean operation
+                           0);                          //copy number
+
+  // Detector
   //
-  G4Box* solidEnv =
-    new G4Box("Envelope",                    //its name
-        0.5*env_sizeXY, 0.5*env_sizeXY, 0.5*env_sizeZ); //its size
-
-  G4LogicalVolume* logicEnv =
-    new G4LogicalVolume(solidEnv,            //its solid
-                        vacuum_material,             //its material
-                        "Envelope");         //its name
-
-  new G4PVPlacement(0,                       //no rotation
-                    G4ThreeVector(),         //at (0,0,0)
-                    logicEnv,                //its logical volume
-                    "Envelope",              //its name
-                    logicWorld,              //its mother  volume
-                    false,                   //no boolean operation
-                    0,                       //copy number
-                    checkOverlaps);          //overlaps checking
+  G4VSolid* 
+  sDetector = new G4Box("Detector",  
+                fTargetRadius, fWorldRadius, fDetectorLength);
 
 
-
-  std::fstream configFile;
-  configFile.open("../src/detector_config.txt", std::ios_base::in);
-
-  // Initialize variables to store detector dimensions
-  G4double det1_t_um, det2_t_um, dist_bw_det_mm, window_t_um, window_gap_mm;
-
-  // Load detector dimensions into variables
-  configFile >> det1_t_um >> det2_t_um >>
-              dist_bw_det_mm >> window_t_um >> window_gap_mm;
-
-  configFile.close();
-
-  // Dimensions for detectors (detector 1 and 2 use the same planar dimensions)
-  G4double detector_dimX = 5.*cm;
-  G4double detector_dimZ = 5.*cm;
-  G4double detector1_thickness = det1_t_um*um;
-  G4double detector2_thickness = det2_t_um*um;
-
-  G4double distance_between_detectors = dist_bw_det_mm*mm;
-
-  // Window dimensions
-  G4double window_thickness = window_t_um*um;
-  G4double window_height    = 5.*cm;  // square window with this side dimension
-  G4double window_gap       = window_gap_mm*mm;
-
-  // ----------------------------------------------------------------
-  // Materials for the detectors
-  // ----------------------------------------------------------------
-
-  // (Element name, symbol, atomic number, atomic mass) (as floats)
-  G4Element* Si = new G4Element("Silicon","Si", 14., 28.0855*g/mole); // main wafer material for detector
-  //G4Element* S = new G4Element("Sulfer","S", 16., 32.065*g/mole);   // possible doping material
-  G4Element* B = new G4Element("Boron","B", 5., 10.811*g/mole);   // possible doping material
-
-  //G4Element* Ga = new G4Element("Gallium","Ga", 31., 69.723*g/mole);
-  //G4Element* As = new G4Element("Arsenic","As", 33., 74.9216*g/mole);
-  //G4Element* Be = new G4Element("Beryllium","Be", 4., 9.0122*g/mole);   // material for window
-
-  // Final doped silicon material to be used in the electron detector
-  G4Material* DopedSilicon = new G4Material("DopedSilicon", 5.8*g/cm3, 2); // last argument is number of components in material
-  DopedSilicon->AddElement(Si, 99.9*perCent);
-  DopedSilicon->AddElement(B, 0.1*perCent);
-
-  //DopedSilicon->AddElement(Ga, 2*perCent);  // Gallium
-  //DopedSilicon->AddElement(As, 2*perCent);  // Arsenic (Gallium Arsenide)
+  fLogicDetector = new G4LogicalVolume(sDetector,       //shape
+                             fDetectorMater,            //material
+                             "Detector");               //name
+                               
+           new G4PVPlacement(0,                         //no rotation
+                           G4ThreeVector(),             //at (0,0,0)
+                           fLogicDetector,              //logical volume
+                           "Detector",                  //name
+                           lWorld,                      //mother  volume
+                           false,                       //no boolean operation
+                           0);                          //copy number
 
 
-  G4ThreeVector detector1_pos  = G4ThreeVector(0, 0, 0);
-  G4ThreeVector detector2_pos = G4ThreeVector(0, 0, 0);
+  PrintParameters();
+  
+  //always return the root volume
+  //
+  return fPhysiWorld;
+}
 
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-  G4VSolid* detector1_solid = new G4Box("detector",
-                   detector_dimX, detector1_thickness, detector_dimZ);
+void DetectorConstruction::PrintParameters()
+{
+  G4cout << "\n Target : Length = " << G4BestUnit(fTargetLength,"Length")
+         << " Radius = " << G4BestUnit(fTargetRadius,"Length")  
+         << " Material = " << fTargetMater->GetName();
+  G4cout << "\n Detector : Length = " << G4BestUnit(fDetectorLength,"Length")
+         << " Tickness = " << G4BestUnit(fDetectorThickness,"Length")  
+         << " Material = " << fDetectorMater->GetName() << G4endl;          
+  G4cout << "\n" << fTargetMater << "\n" << fDetectorMater << G4endl;
+}
 
-  G4VSolid* detector2_solid = new G4Box("detector",
-                  detector_dimX, detector2_thickness, detector_dimZ);
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-  // ----------------------------------------------------------------
-  // Detector 1 (closest to window)
-  // ----------------------------------------------------------------
+void DetectorConstruction::SetTargetMaterial(G4String materialChoice)
+{
+  // search the material by its name
+  G4Material* pttoMaterial =
+     G4NistManager::Instance()->FindOrBuildMaterial(materialChoice);   
+  
+  if (pttoMaterial) { 
+    fTargetMater = pttoMaterial;
+    if(fLogicTarget) { fLogicTarget->SetMaterial(fTargetMater); }
+    G4RunManager::GetRunManager()->PhysicsHasBeenModified();
+  } else {
+    G4cout << "\n--> warning from DetectorConstruction::SetTargetMaterial : "
+           << materialChoice << " not found" << G4endl;
+  }              
+}
 
-  // Detector 1 exists at the origin
-  detector1_pos  = G4ThreeVector(0, 0, 0);
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-  G4LogicalVolume* detector1 =
-  new G4LogicalVolume(detector1_solid,      //its solid
-                      DopedSilicon,        //its material
-                      "detector1");      //its name
+void DetectorConstruction::SetDetectorMaterial(G4String materialChoice)
+{
+  // search the material by its name
+  G4Material* pttoMaterial =
+     G4NistManager::Instance()->FindOrBuildMaterial(materialChoice);   
+  
+  if (pttoMaterial) { 
+    fDetectorMater = pttoMaterial;
+    if(fLogicDetector) { fLogicDetector->SetMaterial(fDetectorMater); }
+    G4RunManager::GetRunManager()->PhysicsHasBeenModified();
+  } else {
+    G4cout << "\n--> warning from DetectorConstruction::SetDetectorMaterial : "
+           << materialChoice << " not found" << G4endl;
+  }              
+}
 
-  new G4PVPlacement(0,                     //no rotation
-                  detector1_pos,            //at position
-                  detector1,                //its logical volume
-                  "detector1",           //its name
-                  logicEnv,                //its mother  volume
-                  false,                   //no boolean operation
-                  0,                       //copy number
-                  checkOverlaps);          //overlaps checking
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-  // ----------------------------------------------------------------
-  // Detector 2 (furthest from window)
-  // ----------------------------------------------------------------
+void DetectorConstruction::SetTargetRadius(G4double value)
+{
+  fTargetRadius = value;
+  G4RunManager::GetRunManager()->ReinitializeGeometry();
+}
 
-  detector2_pos  = G4ThreeVector(0, detector1_thickness/2 + detector2_thickness/2 + distance_between_detectors, 0);
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-  G4LogicalVolume* detector2 =
-  new G4LogicalVolume(detector2_solid,      //its solid
-                      DopedSilicon,        //its material
-                      "detector2");      //its name
+void DetectorConstruction::SetTargetLength(G4double value)
+{
+  fTargetLength = value;
+  G4RunManager::GetRunManager()->ReinitializeGeometry();
+}
 
-  new G4PVPlacement(0,                     //no rotation
-                  detector2_pos,            //at position
-                  detector2,                //its logical volume
-                  "detector2",           //its name
-                  logicEnv,                //its mother  volume
-                  false,                   //no boolean operation
-                  0,                       //copy number
-                  checkOverlaps);          //overlaps checking
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
+void DetectorConstruction::SetDetectorThickness(G4double value)
+{
+  fDetectorThickness = value;
+  G4RunManager::GetRunManager()->ReinitializeGeometry();
+}
 
-  // ----------------------------------------------------------------
-  // Window
-  // ----------------------------------------------------------------
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-  G4Material* window_material = nist->FindOrBuildMaterial("G4_Al");
-  G4VSolid*   window_solid = new G4Box("window", detector_dimX, window_thickness,  window_height);
+void DetectorConstruction::SetDetectorLength(G4double value)
+{
+  fDetectorLength = value;
+  G4RunManager::GetRunManager()->ReinitializeGeometry();
+}
 
-  G4ThreeVector window_pos;
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
+G4double DetectorConstruction::GetTargetLength()
+{
+  return fTargetLength;
+}
 
-  // Creation of beryllium window to repel protons and other particles
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-  window_pos = G4ThreeVector(0, -(detector1_thickness/2 + window_thickness/2 + window_gap),  0);
+G4double DetectorConstruction::GetTargetRadius()
+{
+  return fTargetRadius;
+}
 
-  G4LogicalVolume* window =
-  new G4LogicalVolume(window_solid,         // its solid
-                      window_material,      // its material
-                      "window");    // its name
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-  new G4PVPlacement(0,                       //no rotation
-                    window_pos,              //at position
-                    window,                  //its logical volume
-                    "window",       //its name
-                    logicEnv,                //its mother  volume
-                    false,                   //no boolean operation
-                    0,                       //copy number
-                    checkOverlaps);          //overlaps checking
+G4Material* DetectorConstruction::GetTargetMaterial()
+{
+  return fTargetMater;
+}
 
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-  // always return the physical World
-  return physWorld;
+G4LogicalVolume* DetectorConstruction::GetLogicTarget()
+{
+  return fLogicTarget;
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+G4double DetectorConstruction::GetDetectorLength()
+{
+  return fDetectorLength;
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+G4double DetectorConstruction::GetDetectorThickness()
+{
+  return fDetectorThickness;
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+G4Material* DetectorConstruction::GetDetectorMaterial()
+{
+  return fDetectorMater;
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+G4LogicalVolume* DetectorConstruction::GetLogicDetector()
+{
+  return fLogicDetector;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

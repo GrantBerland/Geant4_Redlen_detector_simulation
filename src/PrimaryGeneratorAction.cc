@@ -23,38 +23,38 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: PrimaryGeneratorAction.cc 94307 2015-11-11 13:42:46Z gcosmo $
-//
 /// \file PrimaryGeneratorAction.cc
 /// \brief Implementation of the PrimaryGeneratorAction class
+//
+//
+// $Id: PrimaryGeneratorAction.cc 67268 2013-02-13 11:38:40Z ihrivnac $
+//
+// 
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #include "PrimaryGeneratorAction.hh"
 
-#include "G4LogicalVolumeStore.hh"
-#include "G4LogicalVolume.hh"
-#include "G4Box.hh"
-#include "G4RunManager.hh"
-#include "G4ParticleGun.hh"
-//#include "G4GeneralParticleSource.hh"
+#include "G4Event.hh"
 #include "G4ParticleTable.hh"
+#include "G4IonTable.hh"
 #include "G4ParticleDefinition.hh"
+#include "G4Geantino.hh"
 #include "G4SystemOfUnits.hh"
-#include "G4UnitsTable.hh"
 #include "Randomize.hh"
-#include <math.h>
 
-#include <fstream>
-
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 PrimaryGeneratorAction::PrimaryGeneratorAction()
-: G4VUserPrimaryGeneratorAction(),
-  fParticleGun(0)
+: G4VUserPrimaryGeneratorAction(),fParticleGun(0)
 {
-  fParticleGun  = new G4ParticleGun();
-  G4ParticleDefinition* electronParticle = G4ParticleTable::GetParticleTable()->FindParticle("e-");
-
-  // Selects electron for particle type
-  fParticleGun->SetParticleDefinition(electronParticle);
+  G4int n_particle = 1;
+  fParticleGun  = new G4ParticleGun(n_particle);
+  
+  fParticleGun->SetParticleEnergy(0*eV);
+  fParticleGun->SetParticlePosition(G4ThreeVector(0.*cm,0.*cm,0.*cm));
+  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -68,43 +68,20 @@ PrimaryGeneratorAction::~PrimaryGeneratorAction()
 
 void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
-
-  G4double PI = 3.14159265358979323846; 
-
-  // Allocating variables for particle and simulation state 
-  G4double xPos, yPos, zPos, xDir, yDir, zDir;
-  G4double energy;
-  G4double particleAngle_theta, particleAngle_phi;
-  G4int    nParticles;
- 
-  
-  std::fstream configFile;
-  configFile.open("./part_energy_theta_phi_nPart.txt", std::ios_base::in);
-
-  configFile >> energy >> particleAngle_theta >> particleAngle_phi >> nParticles;
-
-  energy *= keV; 		   // input in keV
-  particleAngle_theta *= PI/180.;  // conversion to radians
-  particleAngle_phi *= PI/180.;    // conversion to radians
-
-  configFile.close();
-
-  // Static (x,y,z) position that allows for up to +/- 45 deg incident angle
-  xPos = 0; yPos = -4 * cm; zPos = 0;  
-  // Momentum direction of particle (not normalized!)
-  yDir = 1;
-  zDir = yDir * tan(particleAngle_theta);
-  xDir = yDir * tan(particleAngle_phi);
-
-  // Generate nParticles events with the above parameters
-  for(G4int i = 0; i<nParticles; i++){
-
-    fParticleGun->SetParticlePosition(G4ThreeVector(xPos, yPos, zPos));
-    fParticleGun->SetParticleMomentumDirection(G4ThreeVector(xDir, yDir, zDir));
-    fParticleGun->SetParticleEnergy(energy);
-    fParticleGun->GeneratePrimaryVertex(anEvent);
-  }
-
+  if (fParticleGun->GetParticleDefinition() == G4Geantino::Geantino()) {  
+    G4int Z = 10, A = 24;
+    G4double ionCharge   = 0.*eplus;
+    G4double excitEnergy = 0.*keV;
+    
+    G4ParticleDefinition* ion
+       = G4IonTable::GetIonTable()->GetIon(Z,A,excitEnergy);
+    fParticleGun->SetParticleDefinition(ion);
+    fParticleGun->SetParticleCharge(ionCharge);
+  }    
+  //create vertex
+  //   
+  fParticleGun->GeneratePrimaryVertex(anEvent);
 }
 
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 

@@ -23,96 +23,73 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: SteppingAction.cc 74483 2013-10-09 13:37:06Z gcosmo $
-//
 /// \file SteppingAction.cc
 /// \brief Implementation of the SteppingAction class
+//
+// $Id: SteppingAction.cc 71404 2013-06-14 16:56:38Z maire $
+// 
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #include "SteppingAction.hh"
-#include "EventAction.hh"
+
 #include "DetectorConstruction.hh"
-// #include "DetectorAnalysis.hh"
-#include "G4Step.hh"
-#include "G4Track.hh"
-#include "G4Event.hh"
+#include "Run.hh"
+#include "EventAction.hh"
+#include "HistoManager.hh"
+
 #include "G4RunManager.hh"
-#include "G4LogicalVolume.hh"
 #include "G4SystemOfUnits.hh"
-#include "G4AutoLock.hh"
+#include "G4UnitsTable.hh"
+                           
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#include <fstream>
-
-namespace { G4Mutex myParticleLog = G4MUTEX_INITIALIZER; }
-
-SteppingAction::SteppingAction(EventAction* eventAction)
-: G4UserSteppingAction(),
-  fEventAction(eventAction)
-{}
+SteppingAction::SteppingAction(DetectorConstruction* det, EventAction* event)
+: G4UserSteppingAction(), fDetector(det), fEventAction(event)
+{ }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 SteppingAction::~SteppingAction()
-{}
+{ }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void SteppingAction::UserSteppingAction(const G4Step* step)
+void SteppingAction::UserSteppingAction(const G4Step* aStep)
 {
-
-  G4bool isEnteringDetector1, isEnteringDetector2;
-  G4String volName, nextVolName;
+  Run* run = static_cast<Run*>(
+        G4RunManager::GetRunManager()->GetNonConstCurrentRun());    
   
-  G4Track* track = step->GetTrack();
-  const G4StepPoint* postPoint = step->GetPostStepPoint();
+  G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
 
- 
-  if (track->GetVolume()) {volName = track->GetVolume()->GetName();}
-  if (track->GetNextVolume()) {nextVolName = track->GetNextVolume()->GetName();}
+  //which volume ?
+  //
+  G4LogicalVolume* lVolume = aStep->GetPreStepPoint()->GetTouchableHandle()
+                             ->GetVolume()->GetLogicalVolume();
+  G4int iVol = 0;
+  if (lVolume == fDetector->GetLogicTarget())   iVol = 1;
+  if (lVolume == fDetector->GetLogicDetector()) iVol = 2;
 
-
-  isEnteringDetector1 = (volName != "detector1" && nextVolName == "detector1");
-  isEnteringDetector2 = (volName != "detector2" && nextVolName == "detector2");
-
-  // Detector 1 particles
-  if (isEnteringDetector1){
-
-    // Gather data about hit event (position, energy)
-    G4ThreeVector pos = postPoint->GetPosition();
-    G4double ene = postPoint->GetKineticEnergy();
-    G4String fileName_detector1 = "../data1/hits.csv";     
-    
-    // Write event data to file
-    LogParticle(pos, ene, fileName_detector1);
-
-  }
-
-
-  // Detector 2 particles
-  if (isEnteringDetector2){
-
-    fEventAction->incrementDetector2Flag();
-
-    G4ThreeVector pos = postPoint->GetPosition();
-    G4double ene = postPoint->GetKineticEnergy();
-    G4String fileName_detector2 = "../data2/hits.csv"; 
-    LogParticle(pos, ene, fileName_detector2);
-
-  }
-
-}
-
-void SteppingAction::LogParticle(G4ThreeVector pos, G4double ene, G4String detectorFileName)
-{
-    
-    G4AutoLock lock(&myParticleLog);
-    
-    std::ofstream hitFile_detector;
-    hitFile_detector.open(detectorFileName, std::ios_base::app);
-    
-    hitFile_detector  << pos.x()/cm << "," << pos.y()/cm << "," 
-	    	      << pos.z()/cm << "," << ene/keV << "\n";
-    
-    hitFile_detector.close();
+  // count processes
+  // 
+  const G4StepPoint* endPoint = aStep->GetPostStepPoint();
+  const G4VProcess* process   = endPoint->GetProcessDefinedStep();
+  run->CountProcesses(process, iVol);
+  
+  // energy deposit
+  //
+  G4double edepStep = aStep->GetTotalEnergyDeposit();
+  if (edepStep <= 0.) return;
+  G4double time   = aStep->GetPreStepPoint()->GetGlobalTime();
+  G4double weight = aStep->GetPreStepPoint()->GetWeight();   
+  fEventAction->AddEdep(iVol, edepStep, time, weight);
+  
+  //fill ntuple id = 2
+  G4int id = 2;   
+  analysisManager->FillNtupleDColumn(id,0, edepStep);
+  analysisManager->FillNtupleDColumn(id,1, time/s);
+  analysisManager->FillNtupleDColumn(id,2, weight);
+  analysisManager->AddNtupleRow(id);      
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

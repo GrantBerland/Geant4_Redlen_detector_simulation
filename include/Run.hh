@@ -23,44 +23,70 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-/// \file PrimaryGeneratorAction.hh
-/// \brief Definition of the PrimaryGeneratorAction class
+/// \file Run.hh
+/// \brief Definition of the Run class
 //
+// $Id: Run.hh 71375 2013-06-14 07:39:33Z maire $
 //
-// $Id: PrimaryGeneratorAction.hh 66241 2012-12-13 18:34:42Z gunter $
-//
-// 
-
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#ifndef PrimaryGeneratorAction_h
-#define PrimaryGeneratorAction_h 1
+#ifndef Run_h
+#define Run_h 1
 
-#include "G4VUserPrimaryGeneratorAction.hh"
-#include "G4ParticleGun.hh"
+#include "G4Run.hh"
+#include "G4VProcess.hh"
 #include "globals.hh"
+#include <map>
 
-class G4Event;
+class DetectorConstruction;
+class G4ParticleDefinition;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
+class Run : public G4Run
 {
   public:
-    PrimaryGeneratorAction();    
-   ~PrimaryGeneratorAction();
+    Run(DetectorConstruction*);
+   ~Run();
 
   public:
-    virtual void GeneratePrimaries(G4Event*);
-    G4ParticleGun* GetParticleGun() {return fParticleGun;};
-
+    void SetPrimary(G4ParticleDefinition* particle, G4double energy);         
+    void CountProcesses(const G4VProcess* process, G4int iVol);
+    void ParticleCount(G4String, G4double, G4int); 
+    void AddEdep (G4double edep1, G4double edep2);
+                          
+    virtual void Merge(const G4Run*);
+    void EndOfRun();
+    void WriteActivity(G4int);     
+   
   private:
-    G4ParticleGun*  fParticleGun;        //pointer a to G4 service class
+    struct ParticleData {
+     ParticleData()
+       : fCount(0), fEmean(0.), fEmin(0.), fEmax(0.) {}
+     ParticleData(G4int count, G4double ekin, G4double emin, G4double emax)
+       : fCount(count), fEmean(ekin), fEmin(emin), fEmax(emax) {}
+     G4int     fCount;
+     G4double  fEmean;
+     G4double  fEmin;
+     G4double  fEmax;
+    };
+     
+  private:
+    DetectorConstruction* fDetector;
+    G4ParticleDefinition* fParticle;
+    G4double              fEkin;
+    
+    G4double fEdepTarget, fEdepTarget2;
+    G4double fEdepDetect, fEdepDetect2;    
+     
+    std::map<G4String,G4int>        fProcCounter1;
+    std::map<G4String,G4int>        fProcCounter2;    
+    std::map<G4String,ParticleData> fParticleDataMap1;                    
+    std::map<G4String,ParticleData> fParticleDataMap2;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
-
 

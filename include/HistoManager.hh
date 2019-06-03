@@ -23,44 +23,37 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-/// \file PrimaryGeneratorAction.hh
-/// \brief Definition of the PrimaryGeneratorAction class
+/// \file HistoManager.hh
+/// \brief Definition of the HistoManager class
 //
-//
-// $Id: PrimaryGeneratorAction.hh 66241 2012-12-13 18:34:42Z gunter $
-//
+// $Id: HistoManager.hh 66586 2012-12-21 10:48:39Z ihrivnac $
 // 
-
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#ifndef PrimaryGeneratorAction_h
-#define PrimaryGeneratorAction_h 1
+#ifndef HistoManager_h
+#define HistoManager_h 1
 
-#include "G4VUserPrimaryGeneratorAction.hh"
-#include "G4ParticleGun.hh"
 #include "globals.hh"
 
-class G4Event;
+//#include "g4root.hh"
+//#include "g4xml.hh"
+#include "g4csv.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
+class HistoManager
 {
   public:
-    PrimaryGeneratorAction();    
-   ~PrimaryGeneratorAction();
-
-  public:
-    virtual void GeneratePrimaries(G4Event*);
-    G4ParticleGun* GetParticleGun() {return fParticleGun;};
+   HistoManager();
+  ~HistoManager();
 
   private:
-    G4ParticleGun*  fParticleGun;        //pointer a to G4 service class
+    void Book();
+    G4String fFileName;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
-
 
