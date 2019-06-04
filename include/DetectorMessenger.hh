@@ -65,6 +65,7 @@ class DetectorMessenger: public G4UImessenger
     G4UIcmdWithADoubleAndUnit* fDetectThicknessCmd;
     G4UIcmdWithADoubleAndUnit* fTargLengthCmd;
     G4UIcmdWithADoubleAndUnit* fDetectLengthCmd;    
+    G4UIcmdWithADoubleAndUnit* fSpacingCmd;    
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

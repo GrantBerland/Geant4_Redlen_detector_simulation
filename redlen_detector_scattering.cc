@@ -97,7 +97,7 @@ int main(int argc,char** argv) {
      UImanager->ApplyCommand(command+fileName);
     }
     
-  else           //define visualization and UI terminal for interactive mode
+  else    //define visualization and UI terminal for interactive mode
     { 
       G4VisManager* visManager = new G4VisExecutive;
       visManager->Initialize();

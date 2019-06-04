@@ -44,7 +44,8 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
 :G4UImessenger(), 
  fDetector(Det), fRdecayDir(0), fDetDir(0),
  fTargMatCmd(0), fDetectMatCmd(0), fTargRadiusCmd(0),
- fDetectThicknessCmd(0), fTargLengthCmd(0), fDetectLengthCmd(0) 
+ fDetectThicknessCmd(0), fTargLengthCmd(0), fDetectLengthCmd(0),
+ fSpacingCmd(0)	
 { 
   fRdecayDir = new G4UIdirectory("/rdecay02/");
   fRdecayDir->SetGuidance("commands specific to this example");
@@ -92,6 +93,15 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
   fDetectLengthCmd->SetUnitCategory("Length");
   fDetectLengthCmd->SetParameterName("choice",false);
   fDetectLengthCmd->AvailableForStates(G4State_PreInit);
+
+  fSpacingCmd =
+       new G4UIcmdWithADoubleAndUnit("/rdecay02/det/setDetectorSpacing",this);
+  fDetectThicknessCmd->SetGuidance("Set the Target to Detector Spacing.");
+  fDetectThicknessCmd->SetUnitCategory("Length");
+  fDetectThicknessCmd->SetParameterName("choice",false);
+  fDetectThicknessCmd->AvailableForStates(G4State_PreInit);
+
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -106,6 +116,7 @@ DetectorMessenger::~DetectorMessenger()
   delete fDetectLengthCmd;
   delete fDetDir;
   delete fRdecayDir;  
+  delete fSpacingCmd;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -131,6 +142,8 @@ void DetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
   if (command == fDetectThicknessCmd ) 
     {fDetector->SetDetectorThickness(
                      fDetectThicknessCmd->GetNewDoubleValue(newValue));}      
+  if (command == fSpacingCmd )
+    {fDetector->SetTargetDetectorSpacing(
+		    fSpacingCmd->GetNewDoubleValue(newValue));}
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

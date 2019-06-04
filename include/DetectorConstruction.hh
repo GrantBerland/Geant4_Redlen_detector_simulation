@@ -61,6 +61,8 @@ class DetectorConstruction : public G4VUserDetectorConstruction
     
     void SetDetectorLength(G4double value);           
     void SetDetectorThickness(G4double value);  
+    void SetTargetDetectorSpacing(G4double value);
+
     void SetDetectorMaterial(G4String);               
                    
     void PrintParameters();
@@ -71,7 +73,8 @@ class DetectorConstruction : public G4VUserDetectorConstruction
     G4double GetTargetRadius();
     G4Material* GetTargetMaterial();       
     G4LogicalVolume* GetLogicTarget();
-    
+  
+    G4double GetTargetDetectorSpacing();  
     G4double GetDetectorLength();
     G4double GetDetectorThickness();
     G4Material* GetDetectorMaterial();                 
@@ -84,6 +87,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction
     G4Material*        fTargetMater;
     G4LogicalVolume*   fLogicTarget;
                  
+    G4double           fTargetDetectorSpacing;
     G4double           fDetectorLength;
     G4double           fDetectorThickness;
     G4Material*        fDetectorMater;
@@ -93,7 +97,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction
     G4double           fWorldRadius;
     G4Material*        fWorldMater;     
     G4VPhysicalVolume* fPhysiWorld;
-                
+
     DetectorMessenger* fDetectorMessenger;
 
   private:

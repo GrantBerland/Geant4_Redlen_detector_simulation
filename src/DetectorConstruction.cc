@@ -60,15 +60,15 @@ DetectorConstruction::DetectorConstruction()
  fTargetMater(0), fLogicTarget(0),
  fDetectorMater(0), fLogicDetector(0), 
  fWorldMater(0), fPhysiWorld(0),
- fDetectorMessenger(0)
-{
-  fTargetLength      = 0.5*cm; 
+ fDetectorMessenger(0) {
+  fTargetLength      = 0.1*cm; 
   fTargetRadius      = 1.*cm;
   fDetectorLength    = 39.*mm; 
   fDetectorThickness = 5.*cm;
+  fTargetDetectorSpacing = 50.*mm;
   
-  fWorldLength = std::max(fTargetLength,fDetectorLength);
-  fWorldRadius = fTargetRadius + fDetectorThickness;
+  fWorldLength = 10.*cm;//std::max(fTargetLength,fDetectorLength);
+  fWorldRadius = fTargetRadius + fDetectorThickness + 10.*cm;
       
   DefineMaterials();
     
@@ -112,14 +112,15 @@ void DetectorConstruction::DefineMaterials()
                       kStateGas, 293.*kelvin, 1.*atmosphere);
     Air20->AddElement(N, fractionmass=0.7);
     Air20->AddElement(O, fractionmass=0.3);
-  //
-  fWorldMater = Air20;
   
   // or use G4 materials data base
   //
-  G4NistManager* man = G4NistManager::Instance();  
-  fTargetMater = man->FindOrBuildMaterial("G4_CESIUM_IODIDE");
-                   
+  G4NistManager* man = G4NistManager::Instance(); 
+  fTargetMater = man->FindOrBuildMaterial("G4_Co", 57);
+ 
+  fWorldMater = Air20;
+
+
  ///G4cout << *(G4Material::GetMaterialTable()) << G4endl;
 }
 
@@ -136,12 +137,12 @@ G4VPhysicalVolume* DetectorConstruction::ConstructVolumes()
   // World
   //
   // (re) compute World dimensions if necessary
-  fWorldLength = std::max(fTargetLength,fDetectorLength);
+  fWorldLength = fWorldLength = 10.*cm;
   fWorldRadius = fTargetRadius + fDetectorThickness;
     
-  G4Tubs*
-  sWorld = new G4Tubs("World",                                 //name
-                 0.,fWorldRadius, 0.5*fWorldLength, 0.,twopi); //dimensions  
+  G4VSolid*
+  sWorld = new G4Box("World",                                 //name
+                 fWorldLength, fWorldLength, fWorldLength); //dimensions  
                    
   G4LogicalVolume*
   lWorld = new G4LogicalVolume(sWorld,                  //shape
@@ -171,7 +172,7 @@ G4VPhysicalVolume* DetectorConstruction::ConstructVolumes()
   target_rotm->rotateX(90.*deg);
   target_rotm->rotateY(90.*deg);  
            new G4PVPlacement(target_rotm,           //90 deg rotation
-                           G4ThreeVector(50.*mm, 0., 0.), //at (0,0,0)
+                           G4ThreeVector(fTargetDetectorSpacing*mm, 0., 0.), //at (0,0,0)
                            fLogicTarget,                //logical volume
                            "Target",                    //name
                            lWorld,                      //mother  volume
@@ -182,7 +183,7 @@ G4VPhysicalVolume* DetectorConstruction::ConstructVolumes()
   //
   G4VSolid* 
   sDetector = new G4Box("Detector",  
-                fTargetRadius, fWorldRadius, fDetectorLength);
+                fTargetRadius, fDetectorLength, fDetectorLength);
 
 
   fLogicDetector = new G4LogicalVolume(sDetector,       //shape
@@ -286,6 +287,14 @@ void DetectorConstruction::SetDetectorLength(G4double value)
   G4RunManager::GetRunManager()->ReinitializeGeometry();
 }
 
+
+void DetectorConstruction::SetTargetDetectorSpacing(G4double value)
+{
+  fTargetDetectorSpacing = value;
+  G4RunManager::GetRunManager()->ReinitializeGeometry();
+}
+
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 G4double DetectorConstruction::GetTargetLength()
@@ -328,6 +337,12 @@ G4double DetectorConstruction::GetDetectorThickness()
   return fDetectorThickness;
 }
 
+G4double DetectorConstruction::GetTargetDetectorSpacing()
+{
+  return fTargetDetectorSpacing;
+}
+
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 G4Material* DetectorConstruction::GetDetectorMaterial()
@@ -341,5 +356,7 @@ G4LogicalVolume* DetectorConstruction::GetLogicDetector()
 {
   return fLogicDetector;
 }
+
+
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
