@@ -64,10 +64,10 @@ DetectorConstruction::DetectorConstruction()
   fTargetLength      = 0.1*cm; 
   fTargetRadius      = 1.*cm;
   fDetectorLength    = 39.*mm; 
-  fDetectorThickness = 5.*cm;
-  fTargetDetectorSpacing = 50.*mm;
+  fDetectorThickness = 2.5*cm;
+  fTargetDetectorSpacing = 7.*cm;
   
-  fWorldLength = 10.*cm;//std::max(fTargetLength,fDetectorLength);
+  fWorldLength = 10.*cm;
   fWorldRadius = fTargetRadius + fDetectorThickness + 10.*cm;
       
   DefineMaterials();
@@ -137,7 +137,7 @@ G4VPhysicalVolume* DetectorConstruction::ConstructVolumes()
   // World
   //
   // (re) compute World dimensions if necessary
-  fWorldLength = fWorldLength = 10.*cm;
+  fWorldLength = 10.*cm;
   fWorldRadius = fTargetRadius + fDetectorThickness;
     
   G4VSolid*
