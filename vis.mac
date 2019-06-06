@@ -63,8 +63,9 @@
 /vis/viewer/set/autoRefresh true
 /vis/verbose warnings
 
-/vis/geometry/set/colour Detector 1 0 0 1 0.5
-/vis/geometry/set/colour Target 1 1 1 1 0.25
+/vis/geometry/set/colour Detector 1 0. 0.561 0. 0.80 
+/vis/geometry/set/colour Shielding 1 0.71 0.71 0.71 0.391
 #
+
 # For file-based drivers, use this to create an empty detector view:
 #/vis/viewer/flush

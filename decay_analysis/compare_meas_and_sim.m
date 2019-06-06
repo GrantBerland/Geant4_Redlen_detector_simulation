@@ -14,13 +14,16 @@ rdecay02h1H16 = importfile("../build/rdecay02_h1_H16.csv");
 
 %%
 
-ignoreBefore = 20;
+ignoreBefore = 30;
+scaleFactor = 8;
 
 % Plot simulation data
 subplot(2,1,2)
-E_vec_geant = linspace(0, 500, 502);
+E_vec_geant = linspace(0, 500, 702);
+
 bar(E_vec_geant(ignoreBefore:end), ...
-    rdecay02h1H11(ignoreBefore:end,1), 1);
+    rdecay02h1H10(ignoreBefore:end,1).*scaleFactor, ... 
+    2);
 
 xlabel("Energy Bin (keV)")
 ylabel("Counts")

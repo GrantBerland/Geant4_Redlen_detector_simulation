@@ -48,6 +48,9 @@
 #include "G4LogicalVolumeStore.hh"
 #include "G4SolidStore.hh"
 #include "G4RunManager.hh"
+#include "G4IntersectionSolid.hh"
+#include "G4SubtractionSolid.hh"
+#include "G4RotationMatrix.hh"
 
 #include "G4SystemOfUnits.hh"
 #include "G4PhysicalConstants.hh"
@@ -58,7 +61,8 @@
 DetectorConstruction::DetectorConstruction()
 :G4VUserDetectorConstruction(),
  fTargetMater(0), fLogicTarget(0),
- fDetectorMater(0), fLogicDetector(0), 
+ fShieldingMater(0), fLogicShielding(0),	
+ fDetectorMater(0), fLogicDetector(0),
  fWorldMater(0), fPhysiWorld(0),
  fDetectorMessenger(0) {
   fTargetLength      = 0.1*cm; 
@@ -120,6 +124,7 @@ void DetectorConstruction::DefineMaterials()
  
   fWorldMater = Air20;
 
+  fShieldingMater = man->FindOrBuildMaterial("G4_Al");
 
  ///G4cout << *(G4Material::GetMaterialTable()) << G4endl;
 }
@@ -159,7 +164,7 @@ G4VPhysicalVolume* DetectorConstruction::ConstructVolumes()
                             
   // Target
   //
-  G4Tubs* 
+  /*G4Tubs* 
   sTarget = new G4Tubs("Target",                                   //name
                   0., fTargetRadius, 0.5*fTargetLength, 0.,twopi); //dimensions
 
@@ -179,6 +184,58 @@ G4VPhysicalVolume* DetectorConstruction::ConstructVolumes()
                            false,                       //no boolean operation
                            0);                          //copy number
 
+*/
+  // Shielding Cutout
+  //
+  
+  G4double outerBoxThickness = 1.0*cm;
+  G4double shieldThickness = 3.*mm;
+  
+  G4VSolid* sShieldingCutout = 
+	  new G4Box("Shielding-cutout",
+		    fTargetRadius+outerBoxThickness-shieldThickness,
+		    fDetectorLength+outerBoxThickness-shieldThickness,
+		    fDetectorLength+outerBoxThickness-shieldThickness);
+
+  G4VSolid* sShieldingBox = 
+	  new G4Box("Shielding-box",
+		    fTargetRadius+outerBoxThickness,
+		    fDetectorLength+outerBoxThickness,
+		    fDetectorLength+outerBoxThickness);
+
+  G4VSolid* sSlit = new G4Box("Slit", outerBoxThickness,
+		  		      2.*mm,
+				      fDetectorLength);
+
+  // Shielding
+  //
+  G4RotationMatrix* rotm = new G4RotationMatrix();
+
+  G4SubtractionSolid* 
+  sShielding_pre = new G4SubtractionSolid("Shielding", 
+		                       sShieldingBox,
+				       sShieldingCutout);//,
+			//	       rotm,
+			//	      G4ThreeVector(0.,0.,0.)); 
+  G4SubtractionSolid* 
+  sShielding = new G4SubtractionSolid("Shielding", 
+		                       sShielding_pre,
+				       sSlit,
+				       rotm,
+				      G4ThreeVector(2.5*cm,0.,0.)); 
+
+
+  fLogicShielding = new G4LogicalVolume(sShielding,      //shape
+                             fShieldingMater,            //material
+                             "Shielding");               //name
+
+           new G4PVPlacement(0,                         //no rotation
+                           G4ThreeVector(),             //at (0,0,0)
+                           fLogicShielding,              //logical volume
+                           "Shielding",                  //name
+                           lWorld,                   //mother  volume
+                           false,                  //no boolean operation
+                           0);                          //copy number
   // Detector
   //
   G4VSolid* 
@@ -194,9 +251,14 @@ G4VPhysicalVolume* DetectorConstruction::ConstructVolumes()
                            G4ThreeVector(),             //at (0,0,0)
                            fLogicDetector,              //logical volume
                            "Detector",                  //name
-                           lWorld,                      //mother  volume
-                           false,                       //no boolean operation
+                           fLogicShielding,            //mother  volume
+                           false,                  //no boolean operation
                            0);                          //copy number
+
+
+
+
+
 
 
   PrintParameters();
