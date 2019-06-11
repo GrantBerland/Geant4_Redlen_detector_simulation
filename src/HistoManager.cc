@@ -71,7 +71,7 @@ void HistoManager::Book()
   // Create all histograms as inactivated 
   // as we have not yet set nbins, vmin, vmax
   //
-  ////analysis->SetHistoDirectoryName("histo");  
+  analysis->SetHistoDirectoryName("histo");  
   ////analysis->SetFirstHistoId(1);
     
   G4int id = analysis->CreateH1("H10","Energy deposit (MeV) in the target",

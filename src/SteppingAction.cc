@@ -41,7 +41,14 @@
 #include "G4RunManager.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4UnitsTable.hh"
-                           
+#include "G4AutoLock.hh"
+#include "G4ThreeVector.hh"
+
+#include <fstream>
+
+
+namespace { G4Mutex myParticleLog = G4MUTEX_INITIALIZER; }
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 SteppingAction::SteppingAction(DetectorConstruction* det, EventAction* event)
@@ -91,5 +98,23 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
   analysisManager->FillNtupleDColumn(id,2, weight);
   analysisManager->AddNtupleRow(id);      
 }
+
+
+void SteppingAction::LogParticle(G4ThreeVector pos, G4double ene, G4String
+ detectorFileName)
+{
+
+    G4AutoLock lock(&myParticleLog);
+
+    std::ofstream hitFile_detector;
+    hitFile_detector.open(detectorFileName, std::ios_base::app);
+
+    hitFile_detector  << pos.x()/cm << "," << pos.y()/cm << ","
+                      << pos.z()/cm << "," << ene/keV << "\n";
+
+    hitFile_detector.close();
+}
+
+
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

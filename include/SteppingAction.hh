@@ -36,6 +36,7 @@
 
 #include "G4UserSteppingAction.hh"
 #include "globals.hh"
+#include "G4ThreeVector.hh"
 
 class DetectorConstruction;
 class EventAction;
@@ -49,7 +50,8 @@ class SteppingAction : public G4UserSteppingAction
    ~SteppingAction();
 
     virtual void UserSteppingAction(const G4Step*);
-    
+    void LogParticle(G4ThreeVector, G4double, G4String);    
+  
   private:
     DetectorConstruction* fDetector;  
     EventAction* fEventAction;    
