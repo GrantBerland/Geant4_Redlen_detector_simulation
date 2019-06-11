@@ -2,7 +2,7 @@
 % Plot detector data
 load('co-57.mat');
 figure(1); subplot(2,1,1);
-histogram(E, Evec)
+hist(E, Evec)
 ylabel("Counts")
 xlim([0 200])
 grid();
@@ -15,8 +15,10 @@ simulation_energy = importfile_hits_csv("../data/hits.csv");
 
 %%
 
+hitsMultiplier = 8;
+
 subplot(2,1,2);
-h = histogram(simulation_energy, Evec);
+h = histogram(simulation_energy, 699);
 %bar(h.Values, h.BinWidth)
 xlim([0 200])
 xlabel("Energy (keV)")

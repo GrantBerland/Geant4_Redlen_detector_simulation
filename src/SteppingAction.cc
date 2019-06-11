@@ -110,10 +110,8 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
   if (track->GetNextVolume()) {nextVolName = track->GetNextVolume()->GetName();}
 
   isEnteringDetector = (volName != "Detector" && nextVolName == "Detector");
-  std::cout << volName << " , " << nextVolName << std::endl; 
   if (isEnteringDetector){
-    std::cout << "A hit!" << std::endl;
-    G4double pos = postPoint->GetPosition();
+    G4ThreeVector pos = postPoint->GetPosition();
     G4double ene = postPoint->GetKineticEnergy();
   
     LogParticle(pos, ene, fileName);

@@ -159,7 +159,7 @@ G4VPhysicalVolume* DetectorConstruction::ConstructVolumes()
                             lWorld,                     //logical volume
                             "World",                    //name
                             0,                          //mother volume
-                            false,                      //no boolean operation
+                            false,                 //no boolean operation
                             0);                         //copy number
                             
   // Target
