@@ -55,6 +55,7 @@ class SteppingAction : public G4UserSteppingAction
   private:
     DetectorConstruction* fDetector;  
     EventAction* fEventAction;    
+    G4String fileName;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

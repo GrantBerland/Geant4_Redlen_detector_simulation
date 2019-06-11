@@ -69,7 +69,7 @@ DetectorConstruction::DetectorConstruction()
   fTargetRadius      = 1.*cm;
   fDetectorLength    = 39.*mm; 
   fDetectorThickness = 2.5*cm;
-  fTargetDetectorSpacing = 7.*cm;
+  fTargetDetectorSpacing = 2.*cm;
   
   fWorldLength = 10.*cm;
   fWorldRadius = fTargetRadius + fDetectorThickness + 10.*cm;

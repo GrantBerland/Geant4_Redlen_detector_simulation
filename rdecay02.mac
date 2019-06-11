@@ -30,5 +30,5 @@
 #/analysis/h1/setAscii 1
 #
 #/run/printProgress 1000
-/run/beamOn 100000
+/run/beamOn 10000
 
