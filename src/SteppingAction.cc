@@ -41,11 +41,19 @@
 #include "G4RunManager.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4UnitsTable.hh"
-                           
+#include "G4AutoLock.hh"
+#include "G4ThreeVector.hh"
+
+#include <fstream>
+
+
+namespace { G4Mutex myParticleLog = G4MUTEX_INITIALIZER; }
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 SteppingAction::SteppingAction(DetectorConstruction* det, EventAction* event)
-: G4UserSteppingAction(), fDetector(det), fEventAction(event)
+: G4UserSteppingAction(), fDetector(det), fEventAction(event),
+  fileName("../data/hits.csv")
 { }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -64,8 +72,8 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
 
   //which volume ?
   //
-  G4LogicalVolume* lVolume = aStep->GetPreStepPoint()->GetTouchableHandle()
-                             ->GetVolume()->GetLogicalVolume();
+  G4LogicalVolume* lVolume = aStep->GetPreStepPoint()->GetTouchableHandle()->GetVolume()->GetLogicalVolume();
+
   G4int iVol = 0;
   if (lVolume == fDetector->GetLogicTarget())   iVol = 1;
   if (lVolume == fDetector->GetLogicDetector()) iVol = 2;
@@ -90,6 +98,42 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
   analysisManager->FillNtupleDColumn(id,1, time/s);
   analysisManager->FillNtupleDColumn(id,2, weight);
   analysisManager->AddNtupleRow(id);      
+
+  // "Manual" recording method
+
+  G4bool isEnteringDetector;
+  G4String volName, nextVolName;
+
+  G4Track* track = aStep->GetTrack();
+  const G4StepPoint* postPoint = aStep->GetPostStepPoint();
+  if (track->GetVolume()) {volName = track->GetVolume()->GetName();}
+  if (track->GetNextVolume()) {nextVolName = track->GetNextVolume()->GetName();}
+
+  isEnteringDetector = (volName != "Detector" && nextVolName == "Detector");
+  if (isEnteringDetector){
+    G4ThreeVector pos = postPoint->GetPosition();
+    G4double ene = postPoint->GetKineticEnergy();
+  
+    LogParticle(pos, ene, fileName);
+  }
+
 }
+
+
+void SteppingAction::LogParticle(G4ThreeVector pos, G4double ene, G4String
+ detectorFileName)
+{
+
+    G4AutoLock lock(&myParticleLog);
+
+    std::ofstream hitFile_detector;
+    hitFile_detector.open(detectorFileName, std::ios_base::app);
+
+    hitFile_detector << ene/keV << "\n";
+
+    hitFile_detector.close();
+}
+
+
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

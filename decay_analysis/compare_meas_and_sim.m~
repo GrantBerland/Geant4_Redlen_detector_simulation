@@ -1,17 +1,17 @@
 
 % Plot detector data
+load('co-57.mat');
 figure(1); subplot(2,1,1);
 hist(E, Evec)
 ylabel("Counts")
 xlim([0 200])
 grid();
+title("Detector Data")
 %%
 % Import data after simulation run
 rdecay02h1H10 = importfile("../build/rdecay02_h1_H10.csv");
 rdecay02h1H11 = importfile("../build/rdecay02_h1_H11.csv");
 rdecay02h1H16 = importfile("../build/rdecay02_h1_H16.csv");
-
-%%
 
 ignoreBefore = 20;
 
@@ -25,4 +25,17 @@ xlabel("Energy Bin (keV)")
 ylabel("Counts")
 xlim([0 200])
 grid();
+title("Simulated Detector Data");
 
+%%
+
+energy = importfile_hits_csv("../data/hits.csv");
+
+%%
+
+subplot(2,1,2);
+histogram(energy, Evec)
+xlim([0 200])
+xlabel("Energy (keV)")
+ylabel("Counts")
+grid();

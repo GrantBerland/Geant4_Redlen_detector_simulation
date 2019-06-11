@@ -90,7 +90,9 @@ class DetectorConstruction : public G4VUserDetectorConstruction
     G4double           fTargetDetectorSpacing;
     G4double           fDetectorLength;
     G4double           fDetectorThickness;
+    G4Material*        fShieldingMater;
     G4Material*        fDetectorMater;
+    G4LogicalVolume*   fLogicShielding;
     G4LogicalVolume*   fLogicDetector;
                
     G4double           fWorldLength;
