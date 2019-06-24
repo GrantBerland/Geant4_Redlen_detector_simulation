@@ -45,6 +45,7 @@ set(rdecay02_SCRIPTS
     vis.mac
     init_vis.mac
     rdecay02.mac
+    beam_test.mac
     )
 
 foreach(_script ${rdecay02_SCRIPTS})

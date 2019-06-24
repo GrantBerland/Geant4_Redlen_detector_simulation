@@ -13,8 +13,8 @@
 #/process/list
 
 #
-/gun/particle ion
-/gun/ion 27 57  # Cobalt 57
+#/gun/particle ion
+#/gun/ion 27 57  # Cobalt 57
 #
 #/analysis/h1/setActivationToAll true
 
@@ -30,5 +30,10 @@
 #/analysis/h1/setAscii 1
 #
 #/run/printProgress 1000
-/run/beamOn 100000
+
+/gun/particle e-
+/gun/direction -1 0 0
+/gun/energy 122 keV
+
+/run/beamOn 100
 
