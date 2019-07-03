@@ -43,8 +43,8 @@
 
 #include "DetectorConstruction.hh"
 #include "PhysicsList.hh"
+//#include "QBBC_modified.hh"
 #include "ActionInitialization.hh"
-#include "SteppingVerbose.hh"
 
 #ifdef G4VIS_USE
  #include "G4VisExecutive.hh"
@@ -70,8 +70,8 @@ int main(int argc,char** argv) {
 
 #ifdef G4MULTITHREADED
   G4MTRunManager* runManager = new G4MTRunManager;
-  G4int nThreads = G4Threading::G4GetNumberOfCores();
-  runManager->SetNumberOfThreads(nThreads);
+  //G4int nThreads = G4Threading::G4GetNumberOfCores();
+  runManager->SetNumberOfThreads(2);
 #else
   //my Verbose output class
   G4VSteppingVerbose::SetInstance(new SteppingVerbose);
@@ -79,13 +79,15 @@ int main(int argc,char** argv) {
 #endif
 
   // set mandatory initialization classes
-  DetectorConstruction* det= new DetectorConstruction;
-  runManager->SetUserInitialization(det);
+  runManager->SetUserInitialization(new DetectorConstruction());
   
+  // Phys list in src and include folders, includes decay physics
   PhysicsList* phys = new PhysicsList;
-  runManager->SetUserInitialization(phys);
   
-  runManager->SetUserInitialization(new ActionInitialization(det));    
+  //QBBC_modified* phys = new QBBC_modified;
+  
+  runManager->SetUserInitialization(phys);
+  runManager->SetUserInitialization(new ActionInitialization());    
      
   // get the pointer to the User Interface manager 
     G4UImanager* UImanager = G4UImanager::GetUIpointer();  

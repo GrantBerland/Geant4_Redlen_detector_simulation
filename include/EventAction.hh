@@ -23,43 +23,52 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
+// $Id: EventAction.hh 93886 2015-11-03 08:28:26Z gcosmo $
+//
 /// \file EventAction.hh
 /// \brief Definition of the EventAction class
-//
-// $Id: EventAction.hh 76293 2013-11-08 13:11:23Z gcosmo $
-// 
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #ifndef EventAction_h
 #define EventAction_h 1
 
 #include "G4UserEventAction.hh"
 #include "globals.hh"
+#include "G4AccumulableManager.hh"
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+class RunAction;
+
+/// Event action class
+///
 
 class EventAction : public G4UserEventAction
 {
   public:
-    EventAction();
-   ~EventAction();
+    EventAction(RunAction* runAction);
+    virtual ~EventAction();
 
-  public:
-    virtual void BeginOfEventAction(const G4Event*);
-    virtual void   EndOfEventAction(const G4Event*);
-    
-    void AddEdep (G4int iVol, G4double Edep, G4double time, G4double weight);
-                
-  private:
-    G4double fEdep1,   fEdep2;
-    G4double fWeight1, fWeight2;
-    G4double fTime0;    
+    virtual void BeginOfEventAction(const G4Event* event);
+    virtual void EndOfEventAction(const G4Event* event);
+
+    // Setter methods for per event detector hits
+    void incrementDetector1Flag(){ det1_hitFlag++;}
+    void incrementDetector2Flag(){ det2_hitFlag++;}
+
+    void resetDetector1Flag(){det1_hitFlag = 0;}
+    void resetDetector2Flag(){det2_hitFlag = 0;}
+
+    void AddEdep(G4double edep) { fEdep += edep; }
+
+
+private:
+  RunAction* fRunAction;
+  G4double   fEdep;
+  G4int det1_hitFlag;
+  G4int det2_hitFlag;
+
+
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
-
-    

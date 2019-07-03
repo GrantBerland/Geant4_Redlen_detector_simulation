@@ -23,49 +23,58 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
+// $Id: RunAction.hh 99560 2016-09-27 07:03:29Z gcosmo $
+//
 /// \file RunAction.hh
 /// \brief Definition of the RunAction class
-//
-// $Id: RunAction.hh 66241 2012-12-13 18:34:42Z gunter $
-//
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #ifndef RunAction_h
 #define RunAction_h 1
 
 #include "G4UserRunAction.hh"
+#include "G4Accumulable.hh"
 #include "globals.hh"
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+// Choose your fighter:
+// #include "g4root.hh"
+#include "g4xml.hh"
+// #include "g4csv.hh"
 
-class DetectorConstruction;
-class Run;
-class PrimaryGeneratorAction;
-class HistoManager;
+class G4Run;
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+/// Run action class
+///
+/// In EndOfRunAction(), it calculates the dose in the selected volume
+/// from the energy deposit accumulated via stepping and event actions.
+/// The computed dose is then printed on the screen.
 
 class RunAction : public G4UserRunAction
 {
   public:
-    RunAction(DetectorConstruction*, PrimaryGeneratorAction*);
-   ~RunAction();
+    RunAction();
+    virtual ~RunAction();
 
-  public:
-    virtual G4Run* GenerateRun();  
+    // virtual G4Run* GenerateRun();
     virtual void BeginOfRunAction(const G4Run*);
     virtual void   EndOfRunAction(const G4Run*);
-                            
+
+    void AddEdep (G4double edep);
+
+    void getFilenameToRunAction(G4String fileName){fFileName = fileName;}
+
+
+
   private:
-    DetectorConstruction*      fDetector;
-    PrimaryGeneratorAction*    fPrimary;
-    Run*                       fRun;    
-    HistoManager*              fHistoManager;
-        
+    G4Accumulable<G4double> fEdep;
+    G4Accumulable<G4double> fEdep2;
+
+    G4String fFileName;
+
+    G4String asciiFileName;
+    std::ofstream *asciiFile;
+
+    G4String histFileName;
+
 };
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
 #endif
-

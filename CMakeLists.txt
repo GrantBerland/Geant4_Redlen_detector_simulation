@@ -40,12 +40,9 @@ target_link_libraries(main ${Geant4_LIBRARIES} )
 # relies on these scripts being in the current working directory.
 #
 set(rdecay02_SCRIPTS
-    debug.mac
-    plotHisto.C
     vis.mac
     init_vis.mac
     rdecay02.mac
-    beam_test.mac
     )
 
 foreach(_script ${rdecay02_SCRIPTS})

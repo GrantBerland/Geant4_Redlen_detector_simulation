@@ -98,9 +98,9 @@ PhysicsList::PhysicsList()
   RegisterPhysics( new G4HadronElasticPhysicsHP(verb) );
   
   // Hadron Inelastic physics
-  RegisterPhysics( new G4HadronPhysicsFTFP_BERT_HP(verb));
+  //RegisterPhysics( new G4HadronPhysicsFTFP_BERT_HP(verb));
   ////RegisterPhysics( new G4HadronPhysicsQGSP_BIC_HP(verb));
-  ////RegisterPhysics( new G4HadronInelasticQBBC(verb));        
+  RegisterPhysics( new G4HadronInelasticQBBC(verb));        
   ////RegisterPhysics( new G4HadronPhysicsINCLXX(verb));
   
   // Ion Elastic scattering
@@ -149,10 +149,10 @@ void PhysicsList::ConstructParticle()
 
 void PhysicsList::SetCuts()
 {
-  SetCutValue(0*mm, "proton");
-  SetCutValue(10*km, "e-");
-  SetCutValue(10*km, "e+");
-  SetCutValue(10*km, "gamma");      
+  SetCutValue(0.25*mm, "proton");
+  SetCutValue(0.25*mm, "e-");
+  SetCutValue(0.25*mm, "e+");
+  SetCutValue(0.25*mm, "gamma");      
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

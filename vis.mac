@@ -24,6 +24,7 @@
 
 # To get nice view
 /vis/geometry/set/visibility World 0 false
+/vis/geometry/set/visibility Envelope 0 false
 #
 # Draw coordinate axes:
 #/vis/scene/add/axes 0 0 0 1 m

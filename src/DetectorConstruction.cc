@@ -23,80 +23,61 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
+// $Id: DetectorConstruction.cc 94307 2015-11-11 13:42:46Z gcosmo $
+//
 /// \file DetectorConstruction.cc
 /// \brief Implementation of the DetectorConstruction class
-//
-// $Id: DetectorConstruction.cc 70755 2013-06-05 12:17:48Z ihrivnac $
-//
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #include "DetectorConstruction.hh"
-#include "DetectorMessenger.hh"
 
-#include "G4Material.hh"
+#include "G4RunManager.hh"
 #include "G4NistManager.hh"
-
-#include "G4Tubs.hh"
 #include "G4Box.hh"
+#include "G4Tubs.hh"
+#include "G4Cons.hh"
+#include "G4Orb.hh"
+#include "G4Sphere.hh"
+#include "G4GenericPolycone.hh"
+#include "G4Trd.hh"
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
-
-#include "G4GeometryManager.hh"
-#include "G4PhysicalVolumeStore.hh"
-#include "G4LogicalVolumeStore.hh"
-#include "G4SolidStore.hh"
-#include "G4RunManager.hh"
-#include "G4IntersectionSolid.hh"
-#include "G4SubtractionSolid.hh"
-#include "G4RotationMatrix.hh"
-
 #include "G4SystemOfUnits.hh"
-#include "G4PhysicalConstants.hh"
-#include "G4UnitsTable.hh"
+#include "G4IntersectionSolid.hh"
+#include "G4RotationMatrix.hh"
+#include "G4SubtractionSolid.hh"
+
+#include <fstream>
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 DetectorConstruction::DetectorConstruction()
-:G4VUserDetectorConstruction(),
- fTargetMater(0), fLogicTarget(0),
- fShieldingMater(0), fLogicShielding(0),	
- fDetectorMater(0), fLogicDetector(0),
- fWorldMater(0), fPhysiWorld(0),
- fDetectorMessenger(0) {
-  fTargetLength      = 0.1*cm; 
-  fTargetRadius      = 1.*cm;
-  fDetectorLength    = 39.*mm; 
-  fDetectorThickness = 2.5*cm;
-  fTargetDetectorSpacing = 2.*cm;
-  
-  fWorldLength = 10.*cm;
-  fWorldRadius = fTargetRadius + fDetectorThickness + 10.*cm;
-      
-  DefineMaterials();
-    
-  fDetectorMessenger = new DetectorMessenger(this);
-}
+: G4VUserDetectorConstruction(),
+  fScoringVolume(0)
+{ }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 DetectorConstruction::~DetectorConstruction()
-{ delete fDetectorMessenger;}
+{ }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 G4VPhysicalVolume* DetectorConstruction::Construct()
 {
-  return ConstructVolumes();
-}
+  // Get nist material manager
+  G4NistManager* nist = G4NistManager::Instance();
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+  // Envelope parameters
+  //
+  G4double env_sizeRadius = 20*cm;
 
-void DetectorConstruction::DefineMaterials()
-{
-  // build materials
- 
+    // Material: Vacuum
+  G4Material* vacuum_material = new G4Material("Vacuum",
+              1.0 , 1.01*g/mole, 1.0E-25*g/cm3,
+              kStateGas, 2.73*kelvin, 3.0E-18*pascal );
+
+
+
   // CZT for detector
   G4Element* Cd = new G4Element("Cadmium","Cd",48., 112.41*g/mole);
   G4Element* Zn = new G4Element("Zinc","Zn", 30., 65.38*g/mole);
@@ -106,319 +87,158 @@ void DetectorConstruction::DefineMaterials()
   CZT->AddElement(Zn, 2*perCent);
   CZT->AddElement(Te, 50*perCent);
 
-  fDetectorMater = CZT; 
-
   G4Element* N  = new G4Element("Nitrogen", "N", 7, 14.01*g/mole);
   G4Element* O  = new G4Element("Oxygen",   "O", 8, 16.00*g/mole);
-  //
-  G4int ncomponents; G4double fractionmass;      
-  G4Material* Air20 = new G4Material("Air", 1.205*mg/cm3, ncomponents=2,
+  
+
+  // Air density in Boulder, CO
+  G4int ncomponents; G4double fractionmass;
+  G4Material* Air20 = new G4Material("Air", 1.056*kg/m3, ncomponents=2,
                       kStateGas, 293.*kelvin, 1.*atmosphere);
-    Air20->AddElement(N, fractionmass=0.7);
-    Air20->AddElement(O, fractionmass=0.3);
   
-  // or use G4 materials data base
+  Air20->AddElement(N, fractionmass=0.7);
+  Air20->AddElement(O, fractionmass=0.3);
+
+
+  // Option to switch on/off checking of volumes overlaps
   //
-  G4NistManager* man = G4NistManager::Instance(); 
-  fTargetMater = man->FindOrBuildMaterial("G4_Co", 57);
- 
-  fWorldMater = Air20;
+  G4bool checkOverlaps = true;
 
-  fShieldingMater = man->FindOrBuildMaterial("G4_Al");
-
- ///G4cout << *(G4Material::GetMaterialTable()) << G4endl;
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-G4VPhysicalVolume* DetectorConstruction::ConstructVolumes()
-{
-  // Cleanup old geometry
-  G4GeometryManager::GetInstance()->OpenGeometry();
-  G4PhysicalVolumeStore::GetInstance()->Clean();
-  G4LogicalVolumeStore::GetInstance()->Clean();
-  G4SolidStore::GetInstance()->Clean();
-  
+  //
   // World
   //
-  // (re) compute World dimensions if necessary
-  fWorldLength = 10.*cm;
-  fWorldRadius = fTargetRadius + fDetectorThickness;
-    
-  G4VSolid*
-  sWorld = new G4Box("World",                                 //name
-                 fWorldLength, fWorldLength, fWorldLength); //dimensions  
-                   
-  G4LogicalVolume*
-  lWorld = new G4LogicalVolume(sWorld,                  //shape
-                             fWorldMater,               //material
-                             "World");                  //name
+  G4double world_sizeRadius = 1.2*env_sizeRadius;
+  //G4Material* world_mat = nist->FindOrBuildMaterial("G4_AIR");
 
-  fPhysiWorld = new G4PVPlacement(0,                    //no rotation
-                            G4ThreeVector(),            //at (0,0,0)
-                            lWorld,                     //logical volume
-                            "World",                    //name
-                            0,                          //mother volume
-                            false,                 //no boolean operation
-                            0);                         //copy number
-                            
-  // Target
+  G4Sphere* solidWorld = new G4Sphere("World",    //its name
+       0., world_sizeRadius, 
+       0.*deg, 360.*deg,
+       0.*deg, 180.*deg);     //its size
+
+  G4LogicalVolume* logicWorld =
+    new G4LogicalVolume(solidWorld,          //its solid
+                        vacuum_material,           //its material
+                        "World");            //its name
+
+  G4VPhysicalVolume* physWorld =
+    new G4PVPlacement(0,                     //no rotation
+                      G4ThreeVector(),       //at (0,0,0)
+                      logicWorld,            //its logical volume
+                      "World",               //its name
+                      0,                     //its mother  volume
+                      false,                 //no boolean operation
+                      0,                     //copy number
+                      checkOverlaps);        //overlaps checking
+
   //
-  /*G4Tubs* 
-  sTarget = new G4Tubs("Target",                                   //name
-                  0., fTargetRadius, 0.5*fTargetLength, 0.,twopi); //dimensions
-
-
-  fLogicTarget = new G4LogicalVolume(sTarget,           //shape
-                             fTargetMater,              //material
-                             "Target");                 //name
-                  
-  G4RotationMatrix* target_rotm = new G4RotationMatrix();
-  target_rotm->rotateX(90.*deg);
-  target_rotm->rotateY(90.*deg);  
-           new G4PVPlacement(target_rotm,           //90 deg rotation
-                           G4ThreeVector(fTargetDetectorSpacing*mm, 0., 0.), //at (0,0,0)
-                           fLogicTarget,                //logical volume
-                           "Target",                    //name
-                           lWorld,                      //mother  volume
-                           false,                       //no boolean operation
-                           0);                          //copy number
-
-*/
-  // Shielding Cutout
+  // Envelope
   //
-  
-  G4double outerBoxThickness = 1.0*cm;
-  G4double shieldThickness = 3.*mm;
-  
-  G4VSolid* sShieldingCutout = 
-	  new G4Box("Shielding-cutout",
-		    fTargetRadius+outerBoxThickness-shieldThickness,
-		    fDetectorLength+outerBoxThickness-shieldThickness,
-		    fDetectorLength+outerBoxThickness-shieldThickness);
+  G4Sphere* solidEnv = new G4Sphere("Envelope",            //its name
+        0., env_sizeRadius, 
+	0.*deg, 360.*deg,
+	0.*deg, 180.*deg); //its size
 
-  G4VSolid* sShieldingBox = 
-	  new G4Box("Shielding-box",
-		    fTargetRadius+outerBoxThickness,
-		    fDetectorLength+outerBoxThickness,
-		    fDetectorLength+outerBoxThickness);
+  G4LogicalVolume* logicEnv =
+    new G4LogicalVolume(solidEnv,            //its solid
+                        Air20,             //its material
+                        "Envelope");         //its name
+
+  new G4PVPlacement(0,                       //no rotation
+                    G4ThreeVector(),         //at (0,0,0)
+                    logicEnv,                //its logical volume
+                    "Envelope",              //its name
+                    logicWorld,              //its mother  volume
+                    false,                   //no boolean operation
+                    0,                       //copy number
+                    checkOverlaps);          //overlaps checking
+
+  // Shielding and Detector Construction
+  //
+
+  G4double outerBoxThickness = 3.0*cm/2.;
+  G4double shieldThickness = 3.*mm/2.;
+  G4double fDetectorLength    = 40.*mm/2;
+  G4double fDetectorThickness = 5.*mm/2;
+
+  G4VSolid* sShieldingCutout =
+          new G4Box("Shielding-cutout",
+                    outerBoxThickness-shieldThickness,
+                    fDetectorLength+outerBoxThickness-shieldThickness,
+                    fDetectorLength+outerBoxThickness-shieldThickness);
+
+  G4VSolid* sShieldingBox =
+          new G4Box("Shielding-box",
+                    outerBoxThickness,
+                    fDetectorLength+outerBoxThickness,
+                    fDetectorLength+outerBoxThickness);
 
   G4VSolid* sSlit = new G4Box("Slit", outerBoxThickness,
-		  		      2.*mm,
-				      fDetectorLength);
+                                      2.*mm/2.,
+                                      fDetectorLength);
 
-  // Shielding
-  //
+
+
+
   G4RotationMatrix* rotm = new G4RotationMatrix();
 
-  G4SubtractionSolid* 
-  sShielding_pre = new G4SubtractionSolid("Shielding", 
-		                       sShieldingBox,
-				       sShieldingCutout);//,
-			//	       rotm,
-			//	      G4ThreeVector(0.,0.,0.)); 
-  G4SubtractionSolid* 
-  sShielding = new G4SubtractionSolid("Shielding", 
-		                       sShielding_pre,
-				       sSlit,
-				       rotm,
-				      G4ThreeVector(2.5*cm,0.,0.)); 
+  G4SubtractionSolid*
+  sShielding_pre = new G4SubtractionSolid("Shielding",
+                                       sShieldingBox,
+                                       sShieldingCutout);//,
+                        //             rotm,
+                        //            G4ThreeVector(0.,0.,0.)); 
+  G4SubtractionSolid*
+  sShielding = new G4SubtractionSolid("Shielding",
+                                       sShielding_pre,
+                                       sSlit,
+                                       rotm,
+                                      G4ThreeVector(2.5*cm,0.,0.));
 
 
-  fLogicShielding = new G4LogicalVolume(sShielding,      //shape
-                             fShieldingMater,            //material
+  G4LogicalVolume* fLogicShielding = 
+	  new G4LogicalVolume(sShielding,      //shape
+                             nist->FindOrBuildMaterial("G4_Al"),//material
                              "Shielding");               //name
 
-           new G4PVPlacement(0,                         //no rotation
-                           G4ThreeVector(),             //at (0,0,0)
-                           fLogicShielding,              //logical volume
-                           "Shielding",                  //name
-                           lWorld,                   //mother  volume
-                           false,                  //no boolean operation
-                           0);                          //copy number
-  // Detector
-  //
-  G4VSolid* 
-  sDetector = new G4Box("Detector",  
-                fTargetRadius, fDetectorLength, fDetectorLength);
+
+  new G4PVPlacement(0,
+		    G4ThreeVector(),
+		    fLogicShielding,
+		    "Shielding",
+		    logicEnv,
+		    false, 
+		    0);
 
 
-  fLogicDetector = new G4LogicalVolume(sDetector,       //shape
-                             fDetectorMater,            //material
+
+  G4VSolid*
+  sDetector = new G4Box("Detector",
+                fDetectorThickness, fDetectorLength, fDetectorLength);
+
+
+  G4LogicalVolume* fLogicDetector = 
+	  new G4LogicalVolume(sDetector,       //shape
+                             nist->FindOrBuildMaterial("G4_Al"),//material
                              "Detector");               //name
-                               
-           new G4PVPlacement(0,                         //no rotation
-                           G4ThreeVector(),             //at (0,0,0)
-                           fLogicDetector,              //logical volume
-                           "Detector",                  //name
-                           fLogicShielding,            //mother  volume
-                           false,                  //no boolean operation
-                           0);                          //copy number
+
+
+  new G4PVPlacement(0,
+		  G4ThreeVector(),
+		  fLogicDetector,
+		  "Detector",
+		  logicEnv,
+		  false,
+		  0);
 
 
 
 
-
-
-
-  PrintParameters();
-  
-  //always return the root volume
-  //
-  return fPhysiWorld;
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void DetectorConstruction::PrintParameters()
-{
-  G4cout << "\n Target : Length = " << G4BestUnit(fTargetLength,"Length")
-         << " Radius = " << G4BestUnit(fTargetRadius,"Length")  
-         << " Material = " << fTargetMater->GetName();
-  G4cout << "\n Detector : Length = " << G4BestUnit(fDetectorLength,"Length")
-         << " Tickness = " << G4BestUnit(fDetectorThickness,"Length")  
-         << " Material = " << fDetectorMater->GetName() << G4endl;          
-  G4cout << "\n" << fTargetMater << "\n" << fDetectorMater << G4endl;
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void DetectorConstruction::SetTargetMaterial(G4String materialChoice)
-{
-  // search the material by its name
-  G4Material* pttoMaterial =
-     G4NistManager::Instance()->FindOrBuildMaterial(materialChoice);   
-  
-  if (pttoMaterial) { 
-    fTargetMater = pttoMaterial;
-    if(fLogicTarget) { fLogicTarget->SetMaterial(fTargetMater); }
-    G4RunManager::GetRunManager()->PhysicsHasBeenModified();
-  } else {
-    G4cout << "\n--> warning from DetectorConstruction::SetTargetMaterial : "
-           << materialChoice << " not found" << G4endl;
-  }              
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void DetectorConstruction::SetDetectorMaterial(G4String materialChoice)
-{
-  // search the material by its name
-  G4Material* pttoMaterial =
-     G4NistManager::Instance()->FindOrBuildMaterial(materialChoice);   
-  
-  if (pttoMaterial) { 
-    fDetectorMater = pttoMaterial;
-    if(fLogicDetector) { fLogicDetector->SetMaterial(fDetectorMater); }
-    G4RunManager::GetRunManager()->PhysicsHasBeenModified();
-  } else {
-    G4cout << "\n--> warning from DetectorConstruction::SetDetectorMaterial : "
-           << materialChoice << " not found" << G4endl;
-  }              
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void DetectorConstruction::SetTargetRadius(G4double value)
-{
-  fTargetRadius = value;
-  G4RunManager::GetRunManager()->ReinitializeGeometry();
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void DetectorConstruction::SetTargetLength(G4double value)
-{
-  fTargetLength = value;
-  G4RunManager::GetRunManager()->ReinitializeGeometry();
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void DetectorConstruction::SetDetectorThickness(G4double value)
-{
-  fDetectorThickness = value;
-  G4RunManager::GetRunManager()->ReinitializeGeometry();
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void DetectorConstruction::SetDetectorLength(G4double value)
-{
-  fDetectorLength = value;
-  G4RunManager::GetRunManager()->ReinitializeGeometry();
-}
-
-
-void DetectorConstruction::SetTargetDetectorSpacing(G4double value)
-{
-  fTargetDetectorSpacing = value;
-  G4RunManager::GetRunManager()->ReinitializeGeometry();
-}
-
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-G4double DetectorConstruction::GetTargetLength()
-{
-  return fTargetLength;
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-G4double DetectorConstruction::GetTargetRadius()
-{
-  return fTargetRadius;
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-G4Material* DetectorConstruction::GetTargetMaterial()
-{
-  return fTargetMater;
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-G4LogicalVolume* DetectorConstruction::GetLogicTarget()
-{
-  return fLogicTarget;
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-G4double DetectorConstruction::GetDetectorLength()
-{
-  return fDetectorLength;
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-G4double DetectorConstruction::GetDetectorThickness()
-{
-  return fDetectorThickness;
-}
-
-G4double DetectorConstruction::GetTargetDetectorSpacing()
-{
-  return fTargetDetectorSpacing;
-}
-
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-G4Material* DetectorConstruction::GetDetectorMaterial()
-{
-  return fDetectorMater;
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-G4LogicalVolume* DetectorConstruction::GetLogicDetector()
-{
-  return fLogicDetector;
+  // always return the physical World
+  return physWorld;
 }
 
 
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+
+

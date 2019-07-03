@@ -23,117 +23,82 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
+// $Id: SteppingAction.cc 74483 2013-10-09 13:37:06Z gcosmo $
+//
 /// \file SteppingAction.cc
 /// \brief Implementation of the SteppingAction class
-//
-// $Id: SteppingAction.cc 71404 2013-06-14 16:56:38Z maire $
-// 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #include "SteppingAction.hh"
-
-#include "DetectorConstruction.hh"
-#include "Run.hh"
 #include "EventAction.hh"
-#include "HistoManager.hh"
-
+#include "DetectorConstruction.hh"
+// #include "DetectorAnalysis.hh"
+#include "G4Step.hh"
+#include "G4Track.hh"
+#include "G4Event.hh"
 #include "G4RunManager.hh"
+#include "G4LogicalVolume.hh"
 #include "G4SystemOfUnits.hh"
-#include "G4UnitsTable.hh"
+
 #include "G4AutoLock.hh"
-#include "G4ThreeVector.hh"
-
 #include <fstream>
+#include <string>
 
-
-namespace { G4Mutex myParticleLog = G4MUTEX_INITIALIZER; }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-SteppingAction::SteppingAction(DetectorConstruction* det, EventAction* event)
-: G4UserSteppingAction(), fDetector(det), fEventAction(event),
-  fileName("../data/hits.csv")
-{ }
+SteppingAction::SteppingAction(EventAction* eventAction)
+: G4UserSteppingAction(),
+  fEventAction(eventAction)
+{}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 SteppingAction::~SteppingAction()
-{ }
+{}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void SteppingAction::UserSteppingAction(const G4Step* aStep)
+void SteppingAction::UserSteppingAction(const G4Step* step)
 {
-  Run* run = static_cast<Run*>(
-        G4RunManager::GetRunManager()->GetNonConstCurrentRun());    
-  
-  G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
+  G4bool isInDetector, isEnteringDetector;
 
-  //which volume ?
-  //
-  G4LogicalVolume* lVolume = aStep->GetPreStepPoint()->GetTouchableHandle()->GetVolume()->GetLogicalVolume();
+  G4Track* track = step->GetTrack();
+  const G4StepPoint* postPoint = step->GetPostStepPoint();
 
-  G4int iVol = 0;
-  if (lVolume == fDetector->GetLogicTarget())   iVol = 1;
-  if (lVolume == fDetector->GetLogicDetector()) iVol = 2;
+  G4String volName;
+  G4String nextVolName;
 
-  // count processes
-  // 
-  const G4StepPoint* endPoint = aStep->GetPostStepPoint();
-  const G4VProcess* process   = endPoint->GetProcessDefinedStep();
-  run->CountProcesses(process, iVol);
-  
-  // energy deposit
-  //
-  G4double edepStep = aStep->GetTotalEnergyDeposit();
-  if (edepStep <= 0.) return;
-  G4double time   = aStep->GetPreStepPoint()->GetGlobalTime();
-  G4double weight = aStep->GetPreStepPoint()->GetWeight();   
-  fEventAction->AddEdep(iVol, edepStep, time, weight);
-  
-  //fill ntuple id = 2
-  G4int id = 2;   
-  analysisManager->FillNtupleDColumn(id,0, edepStep);
-  analysisManager->FillNtupleDColumn(id,1, time/s);
-  analysisManager->FillNtupleDColumn(id,2, weight);
-  analysisManager->AddNtupleRow(id);      
-
-  // "Manual" recording method
-
-  G4bool isEnteringDetector;
-  G4String volName, nextVolName;
-
-  G4Track* track = aStep->GetTrack();
-  const G4StepPoint* postPoint = aStep->GetPostStepPoint();
-  if (track->GetVolume()) {volName = track->GetVolume()->GetName();}
+  if(track->GetVolume()) {volName = track->GetVolume()->GetName();}
   if (track->GetNextVolume()) {nextVolName = track->GetNextVolume()->GetName();}
 
-  isEnteringDetector = (volName != "Detector" && nextVolName == "Detector");
-  if (isEnteringDetector){
+  G4bool check1 = (volName == "Detector");
+  G4bool check2 = (nextVolName == "Detector");
+
+  isInDetector = (check1 && check2);
+  isEnteringDetector = (!check1 && check2);
+
+  // Detector 1 particles
+  if (isInDetector || isEnteringDetector){
+
+    // Lock thread during hit event and writing,
+    // auto unlocks on step outside scope
+    G4Mutex aMutex = G4MUTEX_INITIALIZER;
+    G4AutoLock l(&aMutex);
+
     G4ThreeVector pos = postPoint->GetPosition();
-    G4double ene = postPoint->GetKineticEnergy();
-  
-    LogParticle(pos, ene, fileName);
+    G4double ene = (step->GetPreStepPoint()->GetKineticEnergy())
+	         - (postPoint->GetKineticEnergy());
+    
+    std::ofstream hitFile_detector1;
+
+    G4String fullFileName = "../data/hits.csv";
+
+    hitFile_detector1.open(fullFileName, std::ios_base::app);
+    hitFile_detector1 << pos.x()/cm << "," << pos.y()/cm << ","
+	    << pos.z()/cm << "," << ene/keV << "\n";
+    hitFile_detector1.close();
   }
 
 }
-
-
-void SteppingAction::LogParticle(G4ThreeVector pos, G4double ene, G4String
- detectorFileName)
-{
-
-    G4AutoLock lock(&myParticleLog);
-
-    std::ofstream hitFile_detector;
-    hitFile_detector.open(detectorFileName, std::ios_base::app);
-
-    hitFile_detector << ene/keV << "\n";
-
-    hitFile_detector.close();
-}
-
-
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -23,92 +23,62 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
+// $Id: RunAction.cc 99560 2016-09-27 07:03:29Z gcosmo $
+//
 /// \file RunAction.cc
 /// \brief Implementation of the RunAction class
-//
-// $Id: RunAction.cc 70756 2013-06-05 12:20:06Z ihrivnac $
-// 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #include "RunAction.hh"
-#include "Run.hh"
-#include "DetectorConstruction.hh"
 #include "PrimaryGeneratorAction.hh"
-#include "HistoManager.hh"
+#include "DetectorConstruction.hh"
+// #include "Run.hh"
+// #include "DetectorAnalysis.hh"
 
-#include "G4Run.hh"
 #include "G4RunManager.hh"
+#include "G4Run.hh"
+#include "G4AccumulableManager.hh"
+#include "G4LogicalVolumeStore.hh"
+#include "G4LogicalVolume.hh"
 #include "G4UnitsTable.hh"
 #include "G4SystemOfUnits.hh"
+// #include "HistoManager.hh"
 
-#include "Randomize.hh"
-#include <iomanip>
 
+#include <fstream>
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-RunAction::RunAction(DetectorConstruction* det, PrimaryGeneratorAction* prim)
-  : G4UserRunAction(),
-    fDetector(det), fPrimary(prim), fRun(0), fHistoManager(0)
-{
- // Book predefined histograms
- fHistoManager = new HistoManager(); 
-}
+
+
+RunAction::RunAction()
+: G4UserRunAction(),
+  fEdep(0.),
+  fEdep2(0.)
+{}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 RunAction::~RunAction()
-{
- delete fHistoManager;
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-G4Run* RunAction::GenerateRun()
-{ 
-  fRun = new Run(fDetector); 
-  return fRun;
-}
+{}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void RunAction::BeginOfRunAction(const G4Run*)
-{    
-  // save Rndm status
-  G4RunManager::GetRunManager()->SetRandomNumberStore(false);
-  if (isMaster) G4Random::showEngineStatus();
-  
-  // keep run condition
-  if (fPrimary) { 
-    G4ParticleDefinition* particle 
-      = fPrimary->GetParticleGun()->GetParticleDefinition();
-    G4double energy = fPrimary->GetParticleGun()->GetParticleEnergy();
-    fRun->SetPrimary(particle, energy);
-  }
-             
-  //histograms
-  //
-  G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
-  if ( analysisManager->IsActive() ) {
-    analysisManager->OpenFile();
-  }  
-}
+{
 
+}
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void RunAction::EndOfRunAction(const G4Run*)
 {
-  if (isMaster) fRun->EndOfRun();    
-  
-  //save histograms      
-  G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
-  if ( analysisManager->IsActive() ) {
-    analysisManager->Write();
-    analysisManager->CloseFile();
-  }
-      
-  // show Rndm status
-  if (isMaster) G4Random::showEngineStatus();
+
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void RunAction::AddEdep(G4double edep)
+{
+  fEdep  += edep;
+  fEdep2 += edep*edep;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

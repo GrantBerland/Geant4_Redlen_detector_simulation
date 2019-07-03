@@ -1,0 +1,33 @@
+# $Id$
+#
+# Macro file for "rdecay02.cc"
+#
+#
+/control/verbose 2
+###/control/cout/ignoreThreadsExcept 0
+/run/numberOfThreads 1 
+/run/verbose 1
+#
+/run/initialize
+#
+/process/list
+
+#
+/gun/particle ion
+/gun/ion 27 57  # Cobalt 57
+#
+/analysis/h1/setActivationToAll false
+
+
+
+
+#/analysis/ntuple/setActivation 0 true
+
+#/analysis/h1/setAscii 0
+#/analysis/h1/setAscii 1
+#
+#/run/printProgress 1000
+#/run/beamOn 1000000
+#/run/beamOn 100
+
+

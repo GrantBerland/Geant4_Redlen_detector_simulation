@@ -1,0 +1,29 @@
+# $Id$
+#
+# Macro file for "rdecay02.cc"
+#
+#
+/control/verbose 2
+###/control/cout/ignoreThreadsExcept 0
+/run/numberOfThreads 2
+/run/verbose 1
+#
+/run/initialize
+#
+/process/list
+#
+/gun/particle ion
+/gun/ion 27 57
+#
+/analysis/setFileName rdecay02
+/analysis/h1/set 0 500 0. 2. keV
+/analysis/h1/set 1 500 0. 2. keV
+/analysis/h1/set 2 500 0. 2. keV
+/analysis/h1/set 3 500 0. 2. keV
+/analysis/h1/set 4 500 0. 2. keV
+/analysis/h1/set 5 500 0. 2. keV
+/analysis/h1/set 6 500 0. 2. keV
+/analysis/ntuple/setActivation 6 true
+#
+/run/printProgress 1000
+/run/beamOn 10000

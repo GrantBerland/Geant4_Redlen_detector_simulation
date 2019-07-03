@@ -1,0 +1,2279 @@
+
+**************************************************************
+ Geant4 version Name: geant4-10-04-patch-02 [MT]   (25-May-2018)
+  << in Multi-threaded mode >> 
+                       Copyright : Geant4 Collaboration
+                      References : NIM A 506 (2003), 250-303
+                                 : IEEE-TNS 53 (2006), 270-278
+                                 : NIM A 835 (2016), 186-225
+                             WWW : http://geant4.org/
+**************************************************************
+
+###/control/cout/ignoreThreadsExcept 0
+/run/numberOfThreads 1
+/run/verbose 1
+#
+/run/initialize
+
+ Target : Length = 1 mm  Radius = 1 cm  Material = G4_Co
+ Detector : Length = 3.9 cm  Tickness = 2.5 cm  Material = CZT
+
+ Material:    G4_Co    density:  8.900 g/cm3   RadL:   1.530 cm   Nucl.Int.Length:  15.304 cm 
+                       Imean: 297.000 eV   temperature: 293.15 K  pressure:   1.00 atm
+
+   --->  Element: Co (Co)   Z = 27.0   N =    59   A = 58.933 g/mole
+         --->  Isotope:  Co59   Z = 27   N =  59   A =  58.93 g/mole   abundance: 100.000 %
+          ElmMassFraction: 100.00 %  ElmAbundance 100.00 % 
+
+ Material:      CZT    density:  5.800 g/cm3   RadL:   1.545 cm   Nucl.Int.Length:  29.619 cm 
+                       Imean: 473.068 eV   temperature: 293.15 K  pressure:   1.00 atm
+
+   --->  Element: Cadmium (Cd)   Z = 48.0   N =   112   A = 112.410 g/mole
+         --->  Isotope: Cd106   Z = 48   N = 106   A = 105.91 g/mole   abundance:  1.250 %
+         --->  Isotope: Cd108   Z = 48   N = 108   A = 107.90 g/mole   abundance:  0.890 %
+         --->  Isotope: Cd110   Z = 48   N = 110   A = 109.90 g/mole   abundance: 12.490 %
+         --->  Isotope: Cd111   Z = 48   N = 111   A = 110.90 g/mole   abundance: 12.800 %
+         --->  Isotope: Cd112   Z = 48   N = 112   A = 111.90 g/mole   abundance: 24.130 %
+         --->  Isotope: Cd113   Z = 48   N = 113   A = 112.90 g/mole   abundance: 12.220 %
+         --->  Isotope: Cd114   Z = 48   N = 114   A = 113.90 g/mole   abundance: 28.730 %
+         --->  Isotope: Cd116   Z = 48   N = 116   A = 115.90 g/mole   abundance:  7.490 %
+          ElmMassFraction:  48.00 %  ElmAbundance  50.27 % 
+
+   --->  Element: Zinc (Zn)   Z = 30.0   N =    65   A = 65.380 g/mole
+         --->  Isotope:  Zn64   Z = 30   N =  64   A =  63.93 g/mole   abundance: 48.630 %
+         --->  Isotope:  Zn66   Z = 30   N =  66   A =  65.93 g/mole   abundance: 27.900 %
+         --->  Isotope:  Zn67   Z = 30   N =  67   A =  66.93 g/mole   abundance:  4.100 %
+         --->  Isotope:  Zn68   Z = 30   N =  68   A =  67.92 g/mole   abundance: 18.750 %
+         --->  Isotope:  Zn70   Z = 30   N =  70   A =  69.93 g/mole   abundance:  0.620 %
+          ElmMassFraction:   2.00 %  ElmAbundance   3.60 % 
+
+   --->  Element: Tellurium (Te)   Z = 52.0   N =   128   A = 127.600 g/mole
+         --->  Isotope: Te120   Z = 52   N = 120   A = 119.90 g/mole   abundance:  0.090 %
+         --->  Isotope: Te122   Z = 52   N = 122   A = 121.90 g/mole   abundance:  2.550 %
+         --->  Isotope: Te123   Z = 52   N = 123   A = 122.90 g/mole   abundance:  0.890 %
+         --->  Isotope: Te124   Z = 52   N = 124   A = 123.90 g/mole   abundance:  4.740 %
+         --->  Isotope: Te125   Z = 52   N = 125   A = 124.90 g/mole   abundance:  7.070 %
+         --->  Isotope: Te126   Z = 52   N = 126   A = 125.90 g/mole   abundance: 18.840 %
+         --->  Isotope: Te128   Z = 52   N = 128   A = 127.90 g/mole   abundance: 31.740 %
+         --->  Isotope: Te130   Z = 52   N = 130   A = 129.91 g/mole   abundance: 34.080 %
+          ElmMassFraction:  50.00 %  ElmAbundance  46.13 % 
+
+/run/physicsModified
+=======================================================================
+======       Radioactive Decay Physics Parameters              ========
+=======================================================================
+Max life time                                     1.4427e+06 ps
+Internal e- conversion flag                       1
+Stored internal conversion coefficients           1
+Enable correlated gamma emission                  0
+Max 2J for sampling of angular correlations       10
+Atomic de-excitation enabled                      1
+Auger electron emission enabled                   1
+Auger cascade enabled                             1
+Check EM cuts disabled for atomic de-excitation   0
+Use Bearden atomic level energies                 0
+=======================================================================
+NeutronHP: /Capture file for Z = 8, A = 18 is not found and NeutronHP will use /home/grant/Documents/Research/Marshall_Research/geant4_build/share/Geant4-10.4.2/data/G4NDL4.5/Capture/CrossSection/8_17_Oxygen
+NeutronHP: /Elastic file for Z = 8, A = 18 is not found and NeutronHP will use /home/grant/Documents/Research/Marshall_Research/geant4_build/share/Geant4-10.4.2/data/G4NDL4.5/Elastic/CrossSection/8_17_Oxygen
+NeutronHP: /Inelastic file for Z = 8, A = 18 is not found and NeutronHP will use /home/grant/Documents/Research/Marshall_Research/geant4_build/share/Geant4-10.4.2/data/G4NDL4.5/Inelastic/CrossSection/8_17_Oxygen
+NeutronHP: /Elastic file for Z = 8, A = 18 is not found and NeutronHP will use /home/grant/Documents/Research/Marshall_Research/geant4_build/share/Geant4-10.4.2/data/G4NDL4.5/Elastic/CrossSection/8_17_Oxygen
+
+====================================================================
+                  HADRONIC PROCESSES SUMMARY (verbose level 1)
+
+---------------------------------------------------
+                           Hadronic Processes for GenericIon
+
+  Process: ionElastic
+        Model:          NNDiffuseElastic: 0 meV/n ---> 1 TeV/n
+     Cr_sctns: Glauber-Gribov nucleus nucleus: 0 meV ---> 2.88022e+295 J  
+     Cr_sctns:            GheishaElastic: 0 meV ---> 100 TeV
+
+  Process: ionInelastic
+        Model:  Binary Light Ion Cascade: 0 meV/n ---> 4 GeV/n
+        Model:                      FTFP: 2 GeV/n ---> 100 TeV/n
+     Cr_sctns: Glauber-Gribov nucleus nucleus: 0 meV ---> 2.88022e+295 J  
+     Cr_sctns:          GheishaInelastic: 0 meV ---> 100 TeV
+
+---------------------------------------------------
+                           Hadronic Processes for He3
+
+  Process: hadElastic
+        Model:              hElasticLHEP: 0 meV/n ---> 100 TeV/n
+     Cr_sctns: Glauber-Gribov nucleus nucleus: 0 meV ---> 2.88022e+295 J  
+     Cr_sctns:            GheishaElastic: 0 meV ---> 100 TeV
+
+  Process: He3Inelastic
+        Model:  Binary Light Ion Cascade: 0 meV/n ---> 4 GeV/n
+        Model:                      FTFP: 2 GeV/n ---> 100 TeV/n
+     Cr_sctns: Glauber-Gribov nucleus nucleus: 0 meV ---> 2.88022e+295 J  
+     Cr_sctns:          GheishaInelastic: 0 meV ---> 100 TeV
+
+---------------------------------------------------
+                           Hadronic Processes for alpha
+
+  Process: hadElastic
+        Model:              hElasticLHEP: 0 meV/n ---> 100 TeV/n
+     Cr_sctns:            GheishaElastic: 0 meV ---> 100 TeV
+
+  Process: alphaInelastic
+        Model:  Binary Light Ion Cascade: 0 meV/n ---> 4 GeV/n
+        Model:                      FTFP: 2 GeV/n ---> 100 TeV/n
+     Cr_sctns: Glauber-Gribov nucleus nucleus: 0 meV ---> 2.88022e+295 J  
+     Cr_sctns:          GheishaInelastic: 0 meV ---> 100 TeV
+
+---------------------------------------------------
+                           Hadronic Processes for anti_He3
+
+  Process: hadElastic
+        Model:              hElasticLHEP: 0 meV/n ---> 100.1 MeV/n
+        Model:              AntiAElastic: 100 MeV/n ---> 100 TeV/n
+     Cr_sctns:              AntiAGlauber: 0 meV ---> 2.88022e+295 J  
+     Cr_sctns:            GheishaElastic: 0 meV ---> 100 TeV
+
+  Process: anti_He3Inelastic
+        Model:                      FTFP: 0 meV/n ---> 100 TeV/n
+     Cr_sctns:              AntiAGlauber: 0 meV ---> 2.88022e+295 J  
+     Cr_sctns:          GheishaInelastic: 0 meV ---> 100 TeV
+
+---------------------------------------------------
+                           Hadronic Processes for anti_alpha
+
+  Process: hadElastic
+        Model:              hElasticLHEP: 0 meV/n ---> 100.1 MeV/n
+        Model:              AntiAElastic: 100 MeV/n ---> 100 TeV/n
+     Cr_sctns:              AntiAGlauber: 0 meV ---> 2.88022e+295 J  
+     Cr_sctns:            GheishaElastic: 0 meV ---> 100 TeV
+
+  Process: anti_alphaInelastic
+        Model:                      FTFP: 0 meV/n ---> 100 TeV/n
+     Cr_sctns:              AntiAGlauber: 0 meV ---> 2.88022e+295 J  
+     Cr_sctns:          GheishaInelastic: 0 meV ---> 100 TeV
+
+---------------------------------------------------
+                           Hadronic Processes for anti_deuteron
+
+  Process: hadElastic
+        Model:              hElasticLHEP: 0 meV/n ---> 100.1 MeV/n
+        Model:              AntiAElastic: 100 MeV/n ---> 100 TeV/n
+     Cr_sctns:              AntiAGlauber: 0 meV ---> 2.88022e+295 J  
+     Cr_sctns:            GheishaElastic: 0 meV ---> 100 TeV
+
+  Process: anti_deuteronInelastic
+        Model:                      FTFP: 0 meV/n ---> 100 TeV/n
+     Cr_sctns:              AntiAGlauber: 0 meV ---> 2.88022e+295 J  
+     Cr_sctns:          GheishaInelastic: 0 meV ---> 100 TeV
+
+---------------------------------------------------
+                           Hadronic Processes for anti_neutron
+
+  Process: hadElastic
+        Model:              hElasticLHEP: 0 meV ---> 100 TeV
+     Cr_sctns:            GheishaElastic: 0 meV ---> 100 TeV
+
+  Process: anti_neutronInelastic
+        Model:                      FTFP: 0 meV ---> 100 TeV
+     Cr_sctns:              AntiAGlauber: 0 meV ---> 2.88022e+295 J  
+     Cr_sctns:          GheishaInelastic: 0 meV ---> 100 TeV
+
+---------------------------------------------------
+                           Hadronic Processes for anti_proton
+
+  Process: hadElastic
+        Model:              hElasticLHEP: 0 meV ---> 100.1 MeV
+        Model:              AntiAElastic: 100 MeV ---> 100 TeV
+     Cr_sctns:              AntiAGlauber: 0 meV ---> 2.88022e+295 J  
+     Cr_sctns:            GheishaElastic: 0 meV ---> 100 TeV
+
+  Process: anti_protonInelastic
+        Model:                      FTFP: 0 meV ---> 100 TeV
+     Cr_sctns:              AntiAGlauber: 0 meV ---> 2.88022e+295 J  
+     Cr_sctns:          GheishaInelastic: 0 meV ---> 100 TeV
+
+---------------------------------------------------
+                           Hadronic Processes for anti_triton
+
+  Process: hadElastic
+        Model:              hElasticLHEP: 0 meV/n ---> 100.1 MeV/n
+        Model:              AntiAElastic: 100 MeV/n ---> 100 TeV/n
+     Cr_sctns:              AntiAGlauber: 0 meV ---> 2.88022e+295 J  
+     Cr_sctns:            GheishaElastic: 0 meV ---> 100 TeV
+
+  Process: anti_tritonInelastic
+        Model:                      FTFP: 0 meV/n ---> 100 TeV/n
+     Cr_sctns:              AntiAGlauber: 0 meV ---> 2.88022e+295 J  
+     Cr_sctns:          GheishaInelastic: 0 meV ---> 100 TeV
+
+---------------------------------------------------
+                           Hadronic Processes for deuteron
+
+  Process: hadElastic
+        Model:              hElasticLHEP: 0 meV/n ---> 100 TeV/n
+     Cr_sctns:            GheishaElastic: 0 meV ---> 100 TeV
+
+  Process: dInelastic
+        Model:  Binary Light Ion Cascade: 0 meV/n ---> 4 GeV/n
+        Model:                      FTFP: 2 GeV/n ---> 100 TeV/n
+     Cr_sctns: Glauber-Gribov nucleus nucleus: 0 meV ---> 2.88022e+295 J  
+     Cr_sctns:          GheishaInelastic: 0 meV ---> 100 TeV
+
+---------------------------------------------------
+                           Hadronic Processes for gamma
+
+  Process: photonNuclear
+        Model:            BertiniCascade: 0 meV ---> 3.5 GeV
+        Model:           TheoFSGenerator: 3 GeV ---> 100 TeV
+     Cr_sctns:            PhotoNuclearXS: 0 meV ---> 100 TeV
+     Cr_sctns:          GheishaInelastic: 0 meV ---> 100 TeV
+
+---------------------------------------------------
+                           Hadronic Processes for kaon+
+
+  Process: hadElastic
+        Model:              hElasticLHEP: 0 meV ---> 100 TeV
+     Cr_sctns:            Glauber-Gribov: 0 meV ---> 2.88022e+295 J  
+     Cr_sctns:            GheishaElastic: 0 meV ---> 100 TeV
+
+  Process: kaon+Inelastic
+        Model:                      FTFP: 3 GeV ---> 100 TeV
+        Model:            BertiniCascade: 0 meV ---> 5 GeV
+     Cr_sctns:            Glauber-Gribov: 0 meV ---> 2.88022e+295 J  
+     Cr_sctns:          GheishaInelastic: 0 meV ---> 100 TeV
+
+---------------------------------------------------
+                           Hadronic Processes for kaon-
+
+  Process: hadElastic
+        Model:              hElasticLHEP: 0 meV ---> 100 TeV
+     Cr_sctns:            Glauber-Gribov: 0 meV ---> 2.88022e+295 J  
+     Cr_sctns:            GheishaElastic: 0 meV ---> 100 TeV
+
+  Process: kaon-Inelastic
+        Model:                      FTFP: 3 GeV ---> 100 TeV
+        Model:            BertiniCascade: 0 meV ---> 5 GeV
+     Cr_sctns:            Glauber-Gribov: 0 meV ---> 2.88022e+295 J  
+     Cr_sctns:          GheishaInelastic: 0 meV ---> 100 TeV
+
+---------------------------------------------------
+                           Hadronic Processes for lambda
+
+  Process: hadElastic
+        Model:              hElasticLHEP: 0 meV ---> 100 TeV
+     Cr_sctns:            GheishaElastic: 0 meV ---> 100 TeV
+
+  Process: lambdaInelastic
+        Model:                      FTFP: 3 GeV ---> 100 TeV
+        Model:            BertiniCascade: 0 meV ---> 5 GeV
+     Cr_sctns:   ChipsHyperonInelasticXS: 0 meV ---> 100 TeV
+     Cr_sctns:          GheishaInelastic: 0 meV ---> 100 TeV
+
+---------------------------------------------------
+                           Hadronic Processes for neutron
+
+  Process: hadElastic
+        Model:             hElasticCHIPS: 19.5 MeV ---> 100 TeV
+        Model:          NeutronHPElastic: 0 meV ---> 20 MeV
+     Cr_sctns:        NeutronHPElasticXS: 0 meV ---> 20 MeV
+     Cr_sctns:        G4NeutronElasticXS: 0 meV ---> 100 TeV
+     Cr_sctns:            GheishaElastic: 0 meV ---> 100 TeV
+
+  Process: neutronInelastic
+        Model:                      FTFP: 3 GeV ---> 100 TeV
+        Model:            BertiniCascade: 1 GeV ---> 5 GeV
+        Model:            Binary Cascade: 0 meV ---> 1.5 GeV
+     Cr_sctns:      G4NeutronInelasticXS: 0 meV ---> 100 TeV
+     Cr_sctns:          GheishaInelastic: 0 meV ---> 100 TeV
+
+  Process: nCapture
+        Model:               nRadCapture: 0 meV ---> 100 TeV
+     Cr_sctns:        G4NeutronCaptureXS: 0 meV ---> 100 TeV
+     Cr_sctns:          GheishaCaptureXS: 0 meV ---> 100 TeV
+
+---------------------------------------------------
+                           Hadronic Processes for pi+
+
+  Process: hadElastic
+        Model:              hElasticLHEP: 0 meV ---> 1.0001 GeV
+        Model:           hElasticGlauber: 1 GeV ---> 100 TeV
+     Cr_sctns:       Barashenkov-Glauber: 0 meV ---> 100 TeV
+     Cr_sctns:            GheishaElastic: 0 meV ---> 100 TeV
+
+  Process: pi+Inelastic
+        Model:                      FTFP: 3 GeV ---> 100 TeV
+        Model:            BertiniCascade: 0 meV ---> 5 GeV
+     Cr_sctns: Barashenkov-Glauber-Gribov: 0 meV ---> 100 TeV
+     Cr_sctns:          GheishaInelastic: 0 meV ---> 100 TeV
+
+---------------------------------------------------
+                           Hadronic Processes for pi-
+
+  Process: hadElastic
+        Model:              hElasticLHEP: 0 meV ---> 1.0001 GeV
+        Model:           hElasticGlauber: 1 GeV ---> 100 TeV
+     Cr_sctns:       Barashenkov-Glauber: 0 meV ---> 100 TeV
+     Cr_sctns:            GheishaElastic: 0 meV ---> 100 TeV
+
+  Process: pi-Inelastic
+        Model:                      FTFP: 3 GeV ---> 100 TeV
+        Model:            BertiniCascade: 0 meV ---> 5 GeV
+     Cr_sctns: Barashenkov-Glauber-Gribov: 0 meV ---> 100 TeV
+     Cr_sctns:          GheishaInelastic: 0 meV ---> 100 TeV
+
+---------------------------------------------------
+                           Hadronic Processes for proton
+
+  Process: hadElastic
+        Model:             hElasticCHIPS: 0 meV ---> 100 TeV
+     Cr_sctns:      ChipsProtonElasticXS: 0 meV ---> 100 TeV
+     Cr_sctns:            GheishaElastic: 0 meV ---> 100 TeV
+
+  Process: protonInelastic
+        Model:                      FTFP: 3 GeV ---> 100 TeV
+        Model:            BertiniCascade: 1 GeV ---> 5 GeV
+        Model:            Binary Cascade: 0 meV ---> 1.5 GeV
+     Cr_sctns:       Barashenkov-Glauber: 0 meV ---> 100 TeV
+     Cr_sctns:          GheishaInelastic: 0 meV ---> 100 TeV
+
+---------------------------------------------------
+                           Hadronic Processes for triton
+
+  Process: hadElastic
+        Model:              hElasticLHEP: 0 meV/n ---> 100 TeV/n
+     Cr_sctns:            GheishaElastic: 0 meV ---> 100 TeV
+
+  Process: tInelastic
+        Model:  Binary Light Ion Cascade: 0 meV/n ---> 4 GeV/n
+        Model:                      FTFP: 2 GeV/n ---> 100 TeV/n
+     Cr_sctns: Glauber-Gribov nucleus nucleus: 0 meV ---> 2.88022e+295 J  
+     Cr_sctns:          GheishaInelastic: 0 meV ---> 100 TeV
+
+================================================================
+G4WT0 > /run/verbose 1
+G4WT0 > /run/initialize 
+G4WT0 > /run/physicsModified 
+=======================================================================
+======       Pre-compound/De-excitation Physics Parameters     ========
+=======================================================================
+Type of pre-compound inverse x-section              3
+Pre-compound model active                           1
+Pre-compound low energy (MeV)                       0.1
+Type of de-excitation inverse x-section             3
+Type of de-excitation factory                       Evaporation
+Number of de-excitation channels                    8
+Min excitation energy (keV)                         0.01
+Min energy per nucleon for multifragmentation (MeV) 1e+05
+Level density (1/MeV)                               0.1
+Time limit for long lived isomeres (ns)             1442.7
+Internal e- conversion flag                         1
+Store e- internal conversion data                   1
+Electron internal conversion ID                     0
+Correlated gamma emission flag                      0
+Max 2J for sampling of angular correlations         10
+=======================================================================
+#
+/process/list
+     Transportation,               phot,              compt,               conv
+               Rayl,                msc,              eIoni,              eBrem
+        CoulombScat,            annihil,             muIoni,            muBrems
+         muPairProd,              hIoni,             hBrems,          hPairProd
+            ionIoni,              Decay,   RadioactiveDecay,         hadElastic
+  anti_He3Inelastic,anti_alphaInelastic,anti_deuteronInelastic,anti_lambdaInelastic
+anti_neutronInelastic,anti_omega-Inelastic,anti_protonInelastic,anti_sigma+Inelastic
+anti_sigma-Inelastic,anti_tritonInelastic,  anti_xi-Inelastic,  anti_xi0Inelastic
+     kaon+Inelastic,     kaon-Inelastic,    kaon0LInelastic,    kaon0SInelastic
+    lambdaInelastic,   neutronInelastic,           nCapture,    omega-Inelastic
+       pi+Inelastic,       pi-Inelastic,    protonInelastic,    sigma+Inelastic
+    sigma-Inelastic,    sigma0Inelastic,       xi-Inelastic,       xi0Inelastic
+         ionElastic,         dInelastic,         tInelastic,       He3Inelastic
+     alphaInelastic,       ionInelastic,      photonNuclear
+#
+/gun/particle ion
+/gun/ion 27 57
+#
+/analysis/h1/setActivationToAll false
+#/analysis/ntuple/setActivation 0 true
+#/analysis/h1/setAscii 0
+#/analysis/h1/setAscii 1
+#
+#/run/printProgress 1000
+#/run/beamOn 1000000
+/run/beamOn 100
+
+========= Table of registered couples ==============================
+
+Index : 0     used in the geometry : Yes
+ Material : Air
+ Range cuts        :  gamma  500 um     e-  500 um     e+  500 um  proton 500 um 
+ Energy thresholds :  gamma  990 eV     e-  990 eV     e+  990 eV  proton 50 keV
+ Region(s) which use this couple : 
+    DefaultRegionForTheWorld
+
+Index : 1     used in the geometry : Yes
+ Material : G4_Al
+ Range cuts        :  gamma  500 um     e-  500 um     e+  500 um  proton 500 um 
+ Energy thresholds :  gamma  5.00023 keV    e-  363.901 keV    e+  351.877 keV proton 50 keV
+ Region(s) which use this couple : 
+    DefaultRegionForTheWorld
+
+Index : 2     used in the geometry : Yes
+ Material : CZT
+ Range cuts        :  gamma  500 um     e-  500 um     e+  500 um  proton 500 um 
+ Energy thresholds :  gamma  25.9429 keV    e-  499.06 keV    e+  482.57 keV proton 50 keV
+ Region(s) which use this couple : 
+    DefaultRegionForTheWorld
+
+====================================================================
+
+### Run 0 starts.
+
+--------- Ranecu engine status ---------
+ Initial seed (index) = 0
+ Current couple of seeds = 9876, 54321
+----------------------------------------
+G4WT0 > /process/list 
+G4WT0 >      Transportation,               phot,              compt,               conv
+G4WT0 >                Rayl,                msc,              eIoni,              eBrem
+G4WT0 >         CoulombScat,            annihil,             muIoni,            muBrems
+G4WT0 >          muPairProd,              hIoni,             hBrems,          hPairProd
+G4WT0 >             ionIoni,              Decay,   RadioactiveDecay,         hadElastic
+G4WT0 >   anti_He3Inelastic,anti_alphaInelastic,anti_deuteronInelastic,anti_lambdaInelastic
+G4WT0 > anti_neutronInelastic,anti_omega-Inelastic,anti_protonInelastic,anti_sigma+Inelastic
+G4WT0 > anti_sigma-Inelastic,anti_tritonInelastic,  anti_xi-Inelastic,  anti_xi0Inelastic
+G4WT0 >      kaon+Inelastic,     kaon-Inelastic,    kaon0LInelastic,    kaon0SInelastic
+G4WT0 >     lambdaInelastic,   neutronInelastic,           nCapture,    omega-Inelastic
+G4WT0 >        pi+Inelastic,       pi-Inelastic,    protonInelastic,    sigma+Inelastic
+G4WT0 >     sigma-Inelastic,    sigma0Inelastic,       xi-Inelastic,       xi0Inelastic
+G4WT0 >          ionElastic,         dInelastic,         tInelastic,       He3Inelastic
+G4WT0 >      alphaInelastic,       ionInelastic,      photonNuclear
+G4WT0 > /gun/particle ion
+G4WT0 > /gun/ion 27 57
+G4WT0 > /analysis/h1/setActivationToAll false
+G4WT0 > ### Run 0 starts on worker thread 0.
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+Shielding
+Shielding
+Shielding
+Shielding
+Shielding
+Shielding
+Shielding
+Shielding
+Shielding
+Shielding
+Shielding
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+Shielding
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+Shielding
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+Shielding
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+Shielding
+World
+Shielding
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+Shielding
+Shielding
+Shielding
+Shielding
+Shielding
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+Shielding
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+Shielding
+Shielding
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+Shielding
+World
+Shielding
+Shielding
+World
+Shielding
+World
+World
+World
+Shielding
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+World
+World
+Shielding
+World
+Shielding
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+World
+Shielding
+World
+World
+World
+World
+Shielding
+Shielding
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+World
+Shielding
+Shielding
+World
+World
+G4WT0 > Thread-local run terminated.
+G4WT0 > Run Summary
+G4WT0 >   Number of events processed : 100
+G4WT0 >   User=0.02s Real=0.04s Sys=0.02s
+ Run terminated.
+Run Summary
+  Number of events processed : 100
+  User=0.02s Real=0.05s Sys=0.02s
+
+ The run is 100 Co57 of 0 meV through : 
+ Target   : Length = 1 mm  Radius    = 1 cm  Material = G4_Co
+ Detector : Length = 3.9 cm  Thickness = 2.5 cm  Material = CZT
+
+ Mean energy deposit in target,   in time window = 0 meV;  rms = 0 meV
+ Mean energy deposit in detector, in time window = 0 meV;  rms = 0 meV
+
+ Process calls frequency in target :
+
+
+ Process calls frequency in detector:
+
+
+ List of generated particles in target:
+
+ List of generated particles in detector:
+
+
+--------- Ranecu engine status ---------
+ Initial seed (index) = 0
+ Current couple of seeds = 14284782, 384523728
+----------------------------------------
+G4WT0 > Destroying WorkerRunManager (0x7f7cd00368d0)
+G4WT0 > G4 kernel has come to Quit state.
+G4WT0 > ================== Deleting memory pools ===================
+G4WT0 > Number of memory pools allocated: 10; of which, static: 0
+G4WT0 > Dynamic pools deleted: 10 / Total memory freed: 0.024 MB
+G4WT0 > ============================================================
+G4WT0 > Thread-local UImanager is to be deleted.
+G4WT0 > There should not be any thread-local G4cout/G4cerr hereafter.
+G4 kernel has come to Quit state.
+================== Deleting memory pools ===================
+Number of memory pools allocated: 4; of which, static: 0
+Dynamic pools deleted: 4 / Total memory freed: 0.0058 MB
+============================================================
+RunManagerKernel is deleted. Good bye :)
