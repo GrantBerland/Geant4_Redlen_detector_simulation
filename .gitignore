@@ -3,15 +3,6 @@
 *.o
 *.odt
 
-__pycache/
-*/__pycache__
-*/*/__pycache__
-*/*/*/__pycache__
-
-/analysis/data/*.txt
+/data
 /build
-/results/.idea
-.idea
-/analysis/data/*.csv
-/analysis/*.m~
-/analysis/fncs/__pychache__/*.pyc
+/data/*
