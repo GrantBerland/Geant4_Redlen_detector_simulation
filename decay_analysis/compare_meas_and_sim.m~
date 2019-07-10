@@ -12,16 +12,18 @@ title("Detector Data")
 
 %%
 
-simulation_energy = importfile_hits_csv("../dat
-a/hits.csv");
+sim_data = importfile_e_pos_csv("../data/hits.csv");
+sim_data.hits = sim_data.x;
+sim_data.x = [];
+sim_data.y = [];
+sim_data.z = [];
 
 %%
 
 energyThreshold1 = 50;
 
 subplot(2,1,2);
-
-histogram(simulation_energy(simulation_energy > energyThreshold1), ...
+histogram(sim_data.hits(sim_data.hits > energyThreshold1), ...
     Evec, 'Normalization', 'Probability');
 set(gca, "YScale", "linear")
 xlim([0 200])
@@ -30,16 +32,27 @@ xlabel("Energy (keV)")
 ylabel("Counts")
 grid();
 
+
 %%
 
-energy_threshold2 = 50;
+scale = 'log';
 
-% Plot both data sets superimposed
-figure(); grid on; hold on;
-histogram(E, Evec, 'Normalization', 'Probability');
-histogram(simulation_energy(simulation_energy > energy_threshold2), ...
-Evec, 'Normalization', 'Probability');
-legend(["Detector","Simulation"]);
-xlim([0 200]);
-xlabel("Energy (keV)");
-ylabel("Counts");
+energyThreshold1 = 50;
+nBins = 1000;
+
+figure(); hold on; grid on;
+histogram(E, Evec, 'Normalization', 'Probability')
+set(gca, 'YScale', scale)
+ylabel("Counts")
+xlim([0 200])
+title("Co-57 CZT Response")
+
+histogram(sim_data.hits(sim_data.hits > energyThreshold1), ...
+        Evec,  'Normalization', 'Probability');
+set(gca, "YScale", scale)
+xlim([0 200])
+xlabel("Energy (keV)")
+ylabel("Normalized Counts")
+
+legend(["Detector data","Simulated data"]);
+

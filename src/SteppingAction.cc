@@ -78,14 +78,14 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   isEnteringDetector = (!check1 && check2);
 
   // Detector 1 particles
-  if (isInDetector || isEnteringDetector){
+  if (isInDetector){
 
     // Lock thread during hit event and writing,
     // auto unlocks on step outside scope
     G4Mutex aMutex = G4MUTEX_INITIALIZER;
     G4AutoLock l(&aMutex);
 
-    G4ThreeVector pos = postPoint->GetPosition();
+    //G4ThreeVector pos = postPoint->GetPosition();
     G4double ene = (step->GetPreStepPoint()->GetKineticEnergy())
 	         - (postPoint->GetKineticEnergy());
     
@@ -94,8 +94,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
     G4String fullFileName = "../data/hits.csv";
 
     hitFile_detector1.open(fullFileName, std::ios_base::app);
-    hitFile_detector1 << pos.x()/cm << "," << pos.y()/cm << ","
-	    << pos.z()/cm << "," << ene/keV << "\n";
+    hitFile_detector1 << ene/keV << "\n";
     hitFile_detector1.close();
   }
 

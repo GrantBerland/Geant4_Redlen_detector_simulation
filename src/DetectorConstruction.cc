@@ -156,7 +156,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   //
 
   G4double outerBoxThickness = 3.0*cm/2.;
-  G4double shieldThickness = 3.*mm/2.;
+  G4double shieldThickness = 3.*mm;
   G4double fDetectorLength    = 40.*mm/2;
   G4double fDetectorThickness = 5.*mm/2;
 
@@ -218,7 +218,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
   G4LogicalVolume* fLogicDetector = 
 	  new G4LogicalVolume(sDetector,       //shape
-                             nist->FindOrBuildMaterial("G4_Al"),//material
+                             CZT,//material
                              "Detector");               //name
 
 

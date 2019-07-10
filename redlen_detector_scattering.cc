@@ -84,8 +84,6 @@ int main(int argc,char** argv) {
   // Phys list in src and include folders, includes decay physics
   PhysicsList* phys = new PhysicsList;
   
-  //QBBC_modified* phys = new QBBC_modified;
-  
   runManager->SetUserInitialization(phys);
   runManager->SetUserInitialization(new ActionInitialization());    
      
